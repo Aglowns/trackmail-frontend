@@ -35,7 +35,7 @@ export default function AuthCallback() {
             router.push('/login?error=session_failed');
           } else {
             console.log('Session set successfully, redirecting to dashboard');
-            router.push('/dashboard');
+            router.push('/');
           }
         } else {
           console.log('No tokens in URL, checking existing session');
@@ -50,7 +50,7 @@ export default function AuthCallback() {
 
           if (data.session) {
             console.log('Existing session found, redirecting to dashboard');
-            router.push('/dashboard');
+            router.push('/');
           } else {
             console.log('No session found, redirecting to login');
             router.push('/login');

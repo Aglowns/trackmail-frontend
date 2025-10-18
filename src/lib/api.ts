@@ -1,0 +1,101 @@
+import axios, { AxiosInstance, AxiosResponse } from 'axios';
+import { supabase } from './supabase';
+import { 
+  Application, 
+  CreateApplicationRequest, 
+  ApplicationFilters, 
+  PaginatedApplications,
+  Event,
+  CreateEventRequest 
+} from '@/types/application';
+
+class ApiClient {
+  private client: AxiosInstance;
+
+  constructor() {
+    this.client = axios.create({
+      baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    // Add request interceptor to inject JWT token
+    this.client.interceptors.request.use(async (config) => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.access_token) {
+        config.headers.Authorization = `Bearer ${session.access_token}`;
+      }
+      return config;
+    });
+
+    // Add response interceptor for error handling
+    this.client.interceptors.response.use(
+      (response) => response,
+      (error) => {
+        if (error.response?.status === 401) {
+          // Handle unauthorized - redirect to login
+          supabase.auth.signOut();
+          window.location.href = '/login';
+        }
+        return Promise.reject(error);
+      }
+    );
+  }
+
+  // Application endpoints
+  async getApplications(filters?: ApplicationFilters, page = 1, limit = 10): Promise<PaginatedApplications> {
+    const params = new URLSearchParams();
+    if (filters?.status) params.append('status', filters.status);
+    if (filters?.company) params.append('company', filters.company);
+    if (filters?.search) params.append('search', filters.search);
+    params.append('page', page.toString());
+    params.append('limit', limit.toString());
+
+    const response: AxiosResponse<PaginatedApplications> = await this.client.get(
+      `/applications?${params.toString()}`
+    );
+    return response.data;
+  }
+
+  async getApplication(id: string): Promise<Application> {
+    const response: AxiosResponse<Application> = await this.client.get(`/applications/${id}`);
+    return response.data;
+  }
+
+  async createApplication(data: CreateApplicationRequest): Promise<Application> {
+    const response: AxiosResponse<Application> = await this.client.post('/applications', data);
+    return response.data;
+  }
+
+  async updateApplication(id: string, data: Partial<CreateApplicationRequest>): Promise<Application> {
+    const response: AxiosResponse<Application> = await this.client.put(`/applications/${id}`, data);
+    return response.data;
+  }
+
+  async deleteApplication(id: string): Promise<void> {
+    await this.client.delete(`/applications/${id}`);
+  }
+
+  // Event endpoints
+  async getApplicationEvents(applicationId: string): Promise<Event[]> {
+    const response: AxiosResponse<Event[]> = await this.client.get(`/applications/${applicationId}/events`);
+    return response.data;
+  }
+
+  async createEvent(data: CreateEventRequest): Promise<Event> {
+    const response: AxiosResponse<Event> = await this.client.post('/events', data);
+    return response.data;
+  }
+
+  async updateEvent(id: string, data: Partial<CreateEventRequest>): Promise<Event> {
+    const response: AxiosResponse<Event> = await this.client.put(`/events/${id}`, data);
+    return response.data;
+  }
+
+  async deleteEvent(id: string): Promise<void> {
+    await this.client.delete(`/events/${id}`);
+  }
+}
+
+export const apiClient = new ApiClient();

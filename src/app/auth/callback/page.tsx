@@ -10,7 +10,7 @@ export default function AuthCallback() {
   useEffect(() => {
     const handleAuthCallback = async () => {
       try {
-        // Get the session from the URL hash
+        // Handle the auth callback from URL hash
         const { data, error } = await supabase.auth.getSession();
         
         if (error) {
@@ -23,8 +23,28 @@ export default function AuthCallback() {
           // User is authenticated, redirect to dashboard
           router.push('/');
         } else {
-          // No session, redirect to login
-          router.push('/login');
+          // Check if we're in the callback flow
+          const hashParams = new URLSearchParams(window.location.hash.substring(1));
+          const accessToken = hashParams.get('access_token');
+          const refreshToken = hashParams.get('refresh_token');
+          
+          if (accessToken && refreshToken) {
+            // Set the session with the tokens from URL
+            const { error: sessionError } = await supabase.auth.setSession({
+              access_token: accessToken,
+              refresh_token: refreshToken,
+            });
+            
+            if (sessionError) {
+              console.error('Session error:', sessionError);
+              router.push('/login?error=session_failed');
+            } else {
+              router.push('/');
+            }
+          } else {
+            // No tokens, redirect to login
+            router.push('/login');
+          }
         }
       } catch (error) {
         console.error('Auth callback error:', error);

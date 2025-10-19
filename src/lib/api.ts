@@ -97,7 +97,8 @@ class ApiClient {
         source_url: data.source_url || '',
         notes: data.notes || '',
         created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
+        updated_at: new Date().toISOString(),
+        user_id: 'temp-user-id' // Add required user_id property
       };
     }
     

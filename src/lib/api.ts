@@ -59,10 +59,11 @@ class ApiClient {
     // Handle simple backend response format
     if (response.data.status === 'success') {
       return {
-        items: response.data.applications || [],
+        applications: response.data.applications || [],
         total: response.data.count || 0,
-        skip: (page - 1) * limit,
-        limit: limit
+        page: page,
+        limit: limit,
+        total_pages: Math.ceil((response.data.count || 0) / limit)
       };
     }
     

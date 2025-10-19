@@ -84,23 +84,12 @@ class ApiClient {
   }
 
   async createApplication(data: CreateApplicationRequest): Promise<Application> {
-    const response: AxiosResponse<{status: string, message: string}> = await this.client.post('/v1/applications', data);
+    const response: AxiosResponse<{status: string, message: string, application: Application}> = await this.client.post('/v1/applications', data);
     
     // Handle simple backend response format
-    if (response.data.status === 'success') {
-      // Return a mock application for now since the simple backend doesn't return the created application
-      return {
-        id: 'temp-id-' + Date.now(),
-        company: data.company,
-        position: data.position,
-        status: data.status,
-        location: data.location || '',
-        source_url: data.source_url || '',
-        notes: data.notes || '',
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-        user_id: 'temp-user-id'
-      };
+    if (response.data.status === 'success' && response.data.application) {
+      // Return the application from the backend response
+      return response.data.application;
     }
     
     // Fallback for unexpected response format

@@ -67,7 +67,14 @@ class ApiClient {
       };
     }
     
-    return response.data;
+    // Fallback for unexpected response format
+    return {
+      applications: [],
+      total: 0,
+      page: page,
+      limit: limit,
+      total_pages: 0
+    };
   }
 
   async getApplication(id: string): Promise<Application> {

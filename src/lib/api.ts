@@ -53,48 +53,48 @@ class ApiClient {
     params.append('limit', limit.toString());
 
     const response: AxiosResponse<PaginatedApplications> = await this.client.get(
-      `/applications?${params.toString()}`
+      `/v1/applications?${params.toString()}`
     );
     return response.data;
   }
 
   async getApplication(id: string): Promise<Application> {
-    const response: AxiosResponse<Application> = await this.client.get(`/applications/${id}`);
+    const response: AxiosResponse<Application> = await this.client.get(`/v1/applications/${id}`);
     return response.data;
   }
 
   async createApplication(data: CreateApplicationRequest): Promise<Application> {
-    const response: AxiosResponse<Application> = await this.client.post('/applications', data);
+    const response: AxiosResponse<Application> = await this.client.post('/v1/applications', data);
     return response.data;
   }
 
   async updateApplication(id: string, data: Partial<CreateApplicationRequest>): Promise<Application> {
-    const response: AxiosResponse<Application> = await this.client.put(`/applications/${id}`, data);
+    const response: AxiosResponse<Application> = await this.client.put(`/v1/applications/${id}`, data);
     return response.data;
   }
 
   async deleteApplication(id: string): Promise<void> {
-    await this.client.delete(`/applications/${id}`);
+    await this.client.delete(`/v1/applications/${id}`);
   }
 
   // Event endpoints
   async getApplicationEvents(applicationId: string): Promise<Event[]> {
-    const response: AxiosResponse<Event[]> = await this.client.get(`/applications/${applicationId}/events`);
+    const response: AxiosResponse<Event[]> = await this.client.get(`/v1/applications/${applicationId}/events`);
     return response.data;
   }
 
   async createEvent(data: CreateEventRequest): Promise<Event> {
-    const response: AxiosResponse<Event> = await this.client.post('/events', data);
+    const response: AxiosResponse<Event> = await this.client.post('/v1/events', data);
     return response.data;
   }
 
   async updateEvent(id: string, data: Partial<CreateEventRequest>): Promise<Event> {
-    const response: AxiosResponse<Event> = await this.client.put(`/events/${id}`, data);
+    const response: AxiosResponse<Event> = await this.client.put(`/v1/events/${id}`, data);
     return response.data;
   }
 
   async deleteEvent(id: string): Promise<void> {
-    await this.client.delete(`/events/${id}`);
+    await this.client.delete(`/v1/events/${id}`);
   }
 }
 

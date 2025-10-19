@@ -1,4 +1,4 @@
-import axios, { AxiosInstance, AxiosResponse } from 'axios';
+import axios, { AxiosResponse } from 'axios';
 import { supabase } from './supabase';
 import { 
   Application, 
@@ -6,15 +6,16 @@ import {
   ApplicationFilters, 
   PaginatedApplications,
   Event,
-  CreateEventRequest 
+  CreateEventRequest
 } from '@/types/application';
 
 class ApiClient {
-  private client: AxiosInstance;
+  private client;
 
   constructor() {
     this.client = axios.create({
       baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000',
+      timeout: 10000,
       headers: {
         'Content-Type': 'application/json',
       },
@@ -98,7 +99,7 @@ class ApiClient {
         notes: data.notes || '',
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
-        user_id: 'temp-user-id' // Add required user_id property
+        user_id: 'temp-user-id'
       };
     }
     
@@ -147,4 +148,5 @@ class ApiClient {
   }
 }
 
+// Export singleton instance
 export const apiClient = new ApiClient();

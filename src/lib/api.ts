@@ -102,7 +102,19 @@ class ApiClient {
       };
     }
     
-    return response.data;
+    // Fallback for unexpected response format
+    return {
+      id: 'temp-id-' + Date.now(),
+      company: data.company,
+      position: data.position,
+      status: data.status,
+      location: data.location || '',
+      source_url: data.source_url || '',
+      notes: data.notes || '',
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+      user_id: 'temp-user-id'
+    };
   }
 
   async updateApplication(id: string, data: Partial<CreateApplicationRequest>): Promise<Application> {

@@ -52,9 +52,20 @@ class ApiClient {
     params.append('page', page.toString());
     params.append('limit', limit.toString());
 
-    const response: AxiosResponse<PaginatedApplications> = await this.client.get(
+    const response: AxiosResponse<any> = await this.client.get(
       `/v1/applications?${params.toString()}`
     );
+    
+    // Handle simple backend response format
+    if (response.data.status === 'success') {
+      return {
+        items: response.data.applications || [],
+        total: response.data.count || 0,
+        skip: (page - 1) * limit,
+        limit: limit
+      };
+    }
+    
     return response.data;
   }
 
@@ -64,7 +75,24 @@ class ApiClient {
   }
 
   async createApplication(data: CreateApplicationRequest): Promise<Application> {
-    const response: AxiosResponse<Application> = await this.client.post('/v1/applications', data);
+    const response: AxiosResponse<any> = await this.client.post('/v1/applications', data);
+    
+    // Handle simple backend response format
+    if (response.data.status === 'success') {
+      // Return a mock application for now since the simple backend doesn't return the created application
+      return {
+        id: 'temp-id-' + Date.now(),
+        company: data.company,
+        position: data.position,
+        status: data.status,
+        location: data.location || '',
+        source_url: data.source_url || '',
+        notes: data.notes || '',
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      };
+    }
+    
     return response.data;
   }
 

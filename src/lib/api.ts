@@ -52,7 +52,7 @@ class ApiClient {
     params.append('page', page.toString());
     params.append('limit', limit.toString());
 
-    const response: AxiosResponse<any> = await this.client.get(
+    const response: AxiosResponse<{status: string, applications: Application[], count: number}> = await this.client.get(
       `/v1/applications?${params.toString()}`
     );
     
@@ -75,7 +75,7 @@ class ApiClient {
   }
 
   async createApplication(data: CreateApplicationRequest): Promise<Application> {
-    const response: AxiosResponse<any> = await this.client.post('/v1/applications', data);
+    const response: AxiosResponse<{status: string, message: string}> = await this.client.post('/v1/applications', data);
     
     // Handle simple backend response format
     if (response.data.status === 'success') {

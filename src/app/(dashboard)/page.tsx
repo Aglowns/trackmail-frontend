@@ -20,6 +20,10 @@ const statusColors: Record<ApplicationStatus, string> = {
   offer_received: 'bg-green-100 text-green-800',
   rejected: 'bg-red-100 text-red-800',
   withdrawn: 'bg-gray-100 text-gray-800',
+  screening: 'bg-orange-100 text-orange-800',
+  interviewing: 'bg-indigo-100 text-indigo-800',
+  offer: 'bg-emerald-100 text-emerald-800',
+  accepted: 'bg-green-100 text-green-800',
 };
 
 const statusLabels: Record<ApplicationStatus, string> = {
@@ -29,6 +33,10 @@ const statusLabels: Record<ApplicationStatus, string> = {
   offer_received: 'Offer Received',
   rejected: 'Rejected',
   withdrawn: 'Withdrawn',
+  screening: 'Screening',
+  interviewing: 'Interviewing',
+  offer: 'Offer',
+  accepted: 'Accepted',
 };
 
 export default function DashboardPage() {
@@ -178,7 +186,7 @@ export default function DashboardPage() {
                 )}
                 <div className="flex justify-between items-center">
                   <div className="text-sm text-gray-500">
-                    Applied: {new Date(application.created_at).toLocaleDateString()}
+                    Applied: {new Date(application.applied_at ?? application.created_at).toLocaleDateString()}
                   </div>
                   <div className="flex space-x-2">
                     <Button

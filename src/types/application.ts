@@ -6,6 +6,7 @@ export interface Application {
   location?: string;
   source_url?: string;
   notes?: string;
+  applied_at?: string;
   created_at: string;
   updated_at: string;
   user_id: string;
@@ -17,7 +18,11 @@ export type ApplicationStatus =
   | 'interview_completed'
   | 'offer_received'
   | 'rejected'
-  | 'withdrawn';
+  | 'withdrawn'
+  | 'screening'
+  | 'interviewing'
+  | 'offer'
+  | 'accepted';
 
 export interface CreateApplicationRequest {
   company: string;

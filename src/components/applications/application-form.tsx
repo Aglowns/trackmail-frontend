@@ -14,7 +14,18 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 const applicationSchema = z.object({
   company: z.string().min(1, 'Company is required'),
   position: z.string().min(1, 'Position is required'),
-  status: z.enum(['applied', 'interview_scheduled', 'interview_completed', 'offer_received', 'rejected', 'withdrawn']),
+  status: z.enum([
+    'applied',
+    'interview_scheduled',
+    'interview_completed',
+    'offer_received',
+    'rejected',
+    'withdrawn',
+    'screening',
+    'interviewing',
+    'offer',
+    'accepted'
+  ]),
   location: z.string().optional(),
   source_url: z.string().url('Must be a valid URL').optional().or(z.literal('')),
   notes: z.string().optional(),
@@ -29,6 +40,10 @@ const statusOptions: { value: ApplicationStatus; label: string }[] = [
   { value: 'offer_received', label: 'Offer Received' },
   { value: 'rejected', label: 'Rejected' },
   { value: 'withdrawn', label: 'Withdrawn' },
+  { value: 'screening', label: 'Screening' },
+  { value: 'interviewing', label: 'Interviewing' },
+  { value: 'offer', label: 'Offer' },
+  { value: 'accepted', label: 'Accepted' },
 ];
 
 interface ApplicationFormProps {

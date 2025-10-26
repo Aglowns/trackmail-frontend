@@ -11,7 +11,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
-import { Plus, Search, Edit, Trash2 } from 'lucide-react';
+import { Plus, Search, Edit, Trash2, ExternalLink } from 'lucide-react';
 
 const statusColors: Record<ApplicationStatus, string> = {
   applied: 'bg-blue-100 text-blue-800',
@@ -184,21 +184,22 @@ export default function DashboardPage() {
                 {application.notes && (
                   <p className="text-gray-700 mb-4">{application.notes}</p>
                 )}
-                <p className="text-sm text-gray-500 mb-4">
-                  Created from email:
+                <div className="mb-4 space-y-1 text-sm text-gray-500">
+                  <div>Created from email</div>
                   {application.source_url ? (
                     <a
                       href={application.source_url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="ml-1 text-indigo-600 hover:text-indigo-700 underline"
+                      className="inline-flex items-center text-indigo-600 hover:text-indigo-700 underline"
                     >
+                      <ExternalLink className="h-3 w-3 mr-1" />
                       View job posting
                     </a>
                   ) : (
-                    <span className="ml-1 text-gray-400">link unavailable</span>
+                    <span className="text-gray-400">link unavailable</span>
                   )}
-                </p>
+                </div>
                 <div className="flex justify-between items-center">
                   <div className="text-sm text-gray-500">
                     Applied: {new Date(application.applied_at ?? application.created_at).toLocaleDateString()}

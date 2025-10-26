@@ -3,7 +3,11 @@
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Application, CreateApplicationRequest, ApplicationStatus } from '@/types/application';
+import {
+  Application,
+  ApplicationStatus,
+  CreateApplicationRequest,
+} from '@/types/application';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -15,36 +19,50 @@ const applicationSchema = z.object({
   company: z.string().min(1, 'Company is required'),
   position: z.string().min(1, 'Position is required'),
   status: z.enum([
+    'wishlist',
     'applied',
-    'interview_scheduled',
-    'interview_completed',
-    'offer_received',
-    'rejected',
-    'withdrawn',
     'screening',
     'interviewing',
+    'interview_scheduled',
+    'interview_completed',
     'offer',
-    'accepted'
+    'offer_received',
+    'accepted',
+    'rejected',
+    'withdrawn',
   ]),
   location: z.string().optional(),
   source_url: z.string().url('Must be a valid URL').optional().or(z.literal('')),
+  source: z.string().optional(),
   notes: z.string().optional(),
+  confidence: z.enum(['High', 'Medium', 'Low']).optional(),
+  salary_range: z.string().optional(),
+  applied_at: z.string().optional(),
 });
 
 type ApplicationFormData = z.infer<typeof applicationSchema>;
 
 const statusOptions: { value: ApplicationStatus; label: string }[] = [
+  { value: 'wishlist', label: 'Wishlist' },
   { value: 'applied', label: 'Applied' },
-  { value: 'interview_scheduled', label: 'Interview Scheduled' },
-  { value: 'interview_completed', label: 'Interview Completed' },
-  { value: 'offer_received', label: 'Offer Received' },
-  { value: 'rejected', label: 'Rejected' },
-  { value: 'withdrawn', label: 'Withdrawn' },
   { value: 'screening', label: 'Screening' },
   { value: 'interviewing', label: 'Interviewing' },
+  { value: 'interview_scheduled', label: 'Interview Scheduled' },
+  { value: 'interview_completed', label: 'Interview Completed' },
   { value: 'offer', label: 'Offer' },
+  { value: 'offer_received', label: 'Offer Received' },
   { value: 'accepted', label: 'Accepted' },
+  { value: 'rejected', label: 'Rejected' },
+  { value: 'withdrawn', label: 'Withdrawn' },
 ];
+
+const confidenceOptions = [
+  { value: 'High', label: 'High' },
+  { value: 'Medium', label: 'Medium' },
+  { value: 'Low', label: 'Low' },
+];
+
+const sourceOptions = ['LinkedIn', 'Company Website', 'Recruiter', 'Referral', 'Job Board', 'Other'];
 
 interface ApplicationFormProps {
   application?: Application;
@@ -67,7 +85,11 @@ export function ApplicationForm({
       status: application?.status || 'applied',
       location: application?.location || '',
       source_url: application?.source_url || '',
+      source: application?.source || '',
       notes: application?.notes || '',
+      confidence: application?.confidence || 'Medium',
+      salary_range: application?.salary_range || '',
+      applied_at: application?.applied_at?.split('T')[0] || '',
     },
   });
 
@@ -78,7 +100,11 @@ export function ApplicationForm({
       status: data.status,
       location: data.location || undefined,
       source_url: data.source_url || undefined,
+      source: data.source || undefined,
       notes: data.notes || undefined,
+      confidence: data.confidence,
+      salary_range: data.salary_range || undefined,
+      applied_at: data.applied_at ? new Date(data.applied_at).toISOString() : undefined,
     };
     await onSubmit(submitData);
   };
@@ -129,7 +155,7 @@ export function ApplicationForm({
               />
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <FormField
                 control={form.control}
                 name="status"
@@ -157,18 +183,84 @@ export function ApplicationForm({
 
               <FormField
                 control={form.control}
-                name="location"
+                name="confidence"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Location</FormLabel>
+                    <FormLabel>Confidence</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select confidence" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {confidenceOptions.map((option) => (
+                          <SelectItem key={option.value} value={option.value}>
+                            {option.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              <FormField
+                control={form.control}
+                name="source"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Source</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select source" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {sourceOptions.map((option) => (
+                          <SelectItem key={option} value={option}>
+                            {option}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="salary_range"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Salary Range</FormLabel>
                     <FormControl>
-                      <Input placeholder="e.g., San Francisco, CA" {...field} />
+                      <Input placeholder="$120k - $150k" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
             </div>
+
+            <FormField
+              control={form.control}
+              name="applied_at"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Date Applied</FormLabel>
+                  <FormControl>
+                    <Input type="date" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
             <FormField
               control={form.control}

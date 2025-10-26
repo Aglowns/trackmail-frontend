@@ -184,6 +184,21 @@ export default function DashboardPage() {
                 {application.notes && (
                   <p className="text-gray-700 mb-4">{application.notes}</p>
                 )}
+                <p className="text-sm text-gray-500 mb-4">
+                  Created from email:
+                  {application.source_url ? (
+                    <a
+                      href={application.source_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="ml-1 text-indigo-600 hover:text-indigo-700 underline"
+                    >
+                      View job posting
+                    </a>
+                  ) : (
+                    <span className="ml-1 text-gray-400">link unavailable</span>
+                  )}
+                </p>
                 <div className="flex justify-between items-center">
                   <div className="text-sm text-gray-500">
                     Applied: {new Date(application.applied_at ?? application.created_at).toLocaleDateString()}

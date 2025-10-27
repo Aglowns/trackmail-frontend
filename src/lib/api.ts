@@ -7,6 +7,7 @@ import {
   CreateEventRequest,
   PaginatedApplications,
   UpdateApplicationRequest,
+  TimelineEvent,
   AnalyticsOverview,
   AnalyticsTrends,
   AnalyticsCompanies,

@@ -1,12 +1,12 @@
 import axios, { AxiosResponse } from 'axios';
 import { supabase } from './supabase';
-import { 
-  Application, 
-  CreateApplicationRequest, 
-  ApplicationFilters, 
+import {
+  Application,
+  CreateApplicationRequest,
+  ApplicationFilters,
   PaginatedApplications,
   Event,
-  CreateEventRequest
+  CreateEventRequest,
 } from '@/types/application';
 
 class ApiClient {
@@ -47,35 +47,21 @@ class ApiClient {
   // Application endpoints
   async getApplications(filters?: ApplicationFilters, page = 1, limit = 10): Promise<PaginatedApplications> {
     const params = new URLSearchParams();
-    if (filters?.status) params.append('status', filters.status);
+    if (filters?.status && filters.status !== 'all') params.append('status', filters.status);
     if (filters?.company) params.append('company', filters.company);
+    if (filters?.source) params.append('source', filters.source);
+    if (filters?.confidence) params.append('confidence', filters.confidence);
     if (filters?.search) params.append('search', filters.search);
+    if (filters?.date_from) params.append('date_from', filters.date_from);
+    if (filters?.date_to) params.append('date_to', filters.date_to);
     params.append('page', page.toString());
     params.append('limit', limit.toString());
 
-    const response: AxiosResponse<{status: string, applications: Application[], count: number}> = await this.client.get(
+    const response: AxiosResponse<PaginatedApplications> = await this.client.get(
       `/v1/applications?${params.toString()}`
     );
-    
-    // Handle simple backend response format
-    if (response.data.status === 'success') {
-      return {
-        applications: response.data.applications || [],
-        total: response.data.count || 0,
-        page: page,
-        limit: limit,
-        total_pages: Math.ceil((response.data.count || 0) / limit)
-      };
-    }
-    
-    // Fallback for unexpected response format
-    return {
-      applications: [],
-      total: 0,
-      page: page,
-      limit: limit,
-      total_pages: 0
-    };
+
+    return response.data;
   }
 
   async getApplication(id: string): Promise<Application> {
@@ -84,38 +70,9 @@ class ApiClient {
   }
 
   async createApplication(data: CreateApplicationRequest): Promise<Application> {
-    const response: AxiosResponse<{status: string, message: string}> = await this.client.post('/v1/applications', data);
-    
-    // Handle simple backend response format
-    if (response.data.status === 'success') {
-      // Return a mock application for now since the simple backend doesn't return the created application
-      return {
-        id: 'temp-id-' + Date.now(),
-        company: data.company,
-        position: data.position,
-        status: data.status,
-        location: data.location || '',
-        source_url: data.source_url || '',
-        notes: data.notes || '',
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-        user_id: 'temp-user-id'
-      };
-    }
-    
-    // Fallback for unexpected response format
-    return {
-      id: 'temp-id-' + Date.now(),
-      company: data.company,
-      position: data.position,
-      status: data.status,
-      location: data.location || '',
-      source_url: data.source_url || '',
-      notes: data.notes || '',
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-      user_id: 'temp-user-id'
-    };
+    const response: AxiosResponse<Application> = await this.client.post('/v1/applications', data);
+
+    return response.data;
   }
 
   async updateApplication(id: string, data: Partial<CreateApplicationRequest>): Promise<Application> {

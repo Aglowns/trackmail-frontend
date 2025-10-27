@@ -17,7 +17,7 @@ const COLUMN_CONFIG: Array<{
 }> = [
   { key: 'applied', title: 'Applied', indicator: 'bg-slate-200 text-slate-700' },
   { key: 'screening', title: 'In Review', indicator: 'bg-blue-100 text-blue-600' },
-  { key: 'assessment', title: 'Assessment', indicator: 'bg-amber-100 text-amber-600' },
+  { key: 'interview_scheduled', title: 'Assessment', indicator: 'bg-amber-100 text-amber-600' },
   { key: 'interviewing', title: 'Interview', indicator: 'bg-emerald-100 text-emerald-600' },
 ];
 
@@ -27,6 +27,8 @@ function statusLabel(status: ApplicationStatus): string {
       return 'Applied';
     case 'screening':
       return 'In Review';
+    case 'interview_scheduled':
+      return 'Assessment';
     case 'interviewing':
     case 'interview_scheduled':
     case 'interview_completed':

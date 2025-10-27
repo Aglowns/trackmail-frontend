@@ -45,7 +45,7 @@ function statusLabel(status: ApplicationStatus): string {
     case 'wishlist':
       return 'Wishlist';
     default:
-      return status.replace('_', ' ');
+      return (status ?? 'unknown').replace('_', ' ');
   }
 }
 

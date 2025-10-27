@@ -60,6 +60,7 @@ export interface UpdateApplicationRequest extends Partial<CreateApplicationReque
 
 export interface ApplicationFilters {
   status?: ApplicationStatus | 'all';
+  company?: string;
   source?: string;
   confidence?: 'High' | 'Medium' | 'Low';
   search?: string;

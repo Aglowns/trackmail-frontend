@@ -28,17 +28,24 @@ export default function AuthCallback() {
       };
 
       // Use a custom API call to create profile with signup data
+      const session = await supabase.auth.getSession();
+      if (!session.data.session?.access_token) {
+        throw new Error('No access token available');
+      }
+
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/v1/profiles/me`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`,
+          'Authorization': `Bearer ${session.data.session.access_token}`,
         },
         body: JSON.stringify(profilePayload),
       });
 
       if (!response.ok) {
-        throw new Error('Failed to create profile');
+        const errorText = await response.text();
+        console.error('Profile creation failed:', response.status, errorText);
+        throw new Error(`Failed to create profile: ${response.status} ${errorText}`);
       }
       console.log('Profile created successfully with signup data');
 
@@ -100,8 +107,14 @@ export default function AuthCallback() {
               await apiClient.getCurrentProfile();
               console.log('Profile exists, redirecting to dashboard');
             } catch (error) {
-              console.log('Profile does not exist, creating default profile');
-              await createProfileWithSignupData();
+              console.log('Profile does not exist, creating profile');
+              try {
+                await createProfileWithSignupData();
+                console.log('Profile created successfully');
+              } catch (profileError) {
+                console.error('Failed to create profile:', profileError);
+                // Don't fail the auth flow, just continue
+              }
             }
             router.push('/');
           } else {

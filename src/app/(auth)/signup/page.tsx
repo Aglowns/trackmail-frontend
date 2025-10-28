@@ -96,6 +96,19 @@ export default function SignupPage() {
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
+                <Label htmlFor="fullName">Full Name *</Label>
+                <Input
+                  id="fullName"
+                  type="text"
+                  value={formData.fullName}
+                  onChange={(e) => handleInputChange('fullName', e.target.value)}
+                  required
+                  className="mt-1"
+                  placeholder="John Doe"
+                />
+              </div>
+
+              <div>
                 <Label htmlFor="email">Email *</Label>
                 <Input
                   id="email"
@@ -105,6 +118,18 @@ export default function SignupPage() {
                   required
                   className="mt-1"
                   placeholder="your@email.com"
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="phone">Phone Number</Label>
+                <Input
+                  id="phone"
+                  type="tel"
+                  value={formData.phone}
+                  onChange={(e) => handleInputChange('phone', e.target.value)}
+                  className="mt-1"
+                  placeholder="+1 (555) 123-4567"
                 />
               </div>
               
@@ -131,31 +156,6 @@ export default function SignupPage() {
                   required
                   className="mt-1"
                   placeholder="Confirm your password"
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="fullName">Full Name *</Label>
-                <Input
-                  id="fullName"
-                  type="text"
-                  value={formData.fullName}
-                  onChange={(e) => handleInputChange('fullName', e.target.value)}
-                  required
-                  className="mt-1"
-                  placeholder="John Doe"
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="phone">Phone Number</Label>
-                <Input
-                  id="phone"
-                  type="tel"
-                  value={formData.phone}
-                  onChange={(e) => handleInputChange('phone', e.target.value)}
-                  className="mt-1"
-                  placeholder="+1 (555) 123-4567"
                 />
               </div>
 

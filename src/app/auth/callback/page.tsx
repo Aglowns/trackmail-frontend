@@ -3,9 +3,52 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
+import { apiClient } from '@/lib/api';
 
 export default function AuthCallback() {
   const router = useRouter();
+
+  const createProfileWithSignupData = async () => {
+    try {
+      // Get stored profile data from localStorage
+      const storedData = localStorage.getItem('pendingProfileData');
+      if (!storedData) {
+        console.log('No stored profile data found, using default profile creation');
+        return;
+      }
+
+      const profileData = JSON.parse(storedData);
+      console.log('Creating profile with stored data:', profileData);
+
+      // Create profile using the API client
+      const profilePayload = {
+        full_name: profileData.fullName,
+        phone: profileData.phone || '',
+        notification_email: '', // Will be set from user email
+      };
+
+      // Use a custom API call to create profile with signup data
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/v1/profiles/me`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`,
+        },
+        body: JSON.stringify(profilePayload),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to create profile');
+      }
+      console.log('Profile created successfully with signup data');
+
+      // Clear the stored data
+      localStorage.removeItem('pendingProfileData');
+    } catch (error) {
+      console.error('Error creating profile with signup data:', error);
+      // Don't fail the auth flow if profile creation fails
+    }
+  };
 
   useEffect(() => {
     const handleAuthCallback = async () => {
@@ -34,7 +77,9 @@ export default function AuthCallback() {
             console.error('Session error:', sessionError);
             router.push('/login?error=session_failed');
           } else {
-            console.log('Session set successfully, redirecting to dashboard');
+            console.log('Session set successfully, creating profile with signup data');
+            // Create profile with stored signup data
+            await createProfileWithSignupData();
             router.push('/');
           }
         } else {
@@ -49,7 +94,15 @@ export default function AuthCallback() {
           }
 
           if (data.session) {
-            console.log('Existing session found, redirecting to dashboard');
+            console.log('Existing session found, checking if profile exists');
+            // Check if profile exists, create one if it doesn't
+            try {
+              await apiClient.getCurrentProfile();
+              console.log('Profile exists, redirecting to dashboard');
+            } catch (error) {
+              console.log('Profile does not exist, creating default profile');
+              await createProfileWithSignupData();
+            }
             router.push('/');
           } else {
             console.log('No session found, redirecting to login');

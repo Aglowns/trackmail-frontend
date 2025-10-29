@@ -21,9 +21,9 @@ export default function DiagnosticsPage() {
     setRunning(true);
     const checks: CheckResult[] = [];
     try {
-      // 1) Health
+      // 1) Health (versioned)
       try {
-        const url = `${process.env.NEXT_PUBLIC_API_URL}/health`;
+        const url = `${process.env.NEXT_PUBLIC_API_URL}/v1/health`;
         const res = await fetch(url, { cache: 'no-store' });
         const data = await res.json().catch(() => ({}));
         checks.push({ name: 'Backend /health', ok: res.ok, details: JSON.stringify(data) });

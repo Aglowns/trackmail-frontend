@@ -11,7 +11,13 @@ import {
   UserProfile,
   UpdateUserProfileRequest,
 } from '@/types/application';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import {
   Form,
@@ -51,14 +57,18 @@ export default function SettingsPage() {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
 
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileSchema),
+    mode: 'onChange',
     defaultValues: {
       full_name: '',
       phone: '',
     },
   });
+
+  const { isDirty, isValid } = form.formState;
 
   useEffect(() => {
     async function load() {
@@ -67,6 +77,7 @@ export default function SettingsPage() {
         const data = await apiClient.getCurrentProfile();
         setProfile(data);
         form.reset(mapProfileToForm(data));
+        setIsEditing(false);
       } catch (error) {
         console.error(error);
         toast.error('Failed to load profile');
@@ -84,6 +95,8 @@ export default function SettingsPage() {
       const payload = mapFormToPayload(values);
       const updated = await apiClient.updateProfile(payload);
       setProfile(updated);
+      form.reset(mapProfileToForm(updated));
+      setIsEditing(false);
       toast.success('Profile updated successfully');
     } catch (error) {
       console.error(error);
@@ -92,6 +105,28 @@ export default function SettingsPage() {
       setSaving(false);
     }
   }
+
+  function handleEdit() {
+    if (profile) {
+      form.reset(mapProfileToForm(profile));
+    }
+    setIsEditing(true);
+  }
+
+  function handleCancel() {
+    if (profile) {
+      form.reset(mapProfileToForm(profile));
+    } else {
+      form.reset({ full_name: '', phone: '' });
+    }
+    setIsEditing(false);
+  }
+
+  const displayName = profile?.full_name?.trim() || 'Add your name';
+  const displayPhone = profile?.phone?.trim() || 'Add your phone number';
+  const lastUpdated = profile?.updated_at
+    ? new Date(profile.updated_at).toLocaleString()
+    : null;
 
   return (
     <div className="space-y-6">
@@ -110,64 +145,111 @@ export default function SettingsPage() {
         </Card>
       ) : (
         <Card>
-          <CardHeader>
-            <CardTitle>Profile Information</CardTitle>
+          <CardHeader className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+            <div>
+              <CardTitle>Profile Information</CardTitle>
+              <CardDescription>
+                Keep your contact details accurate so recruiters can reach you.
+              </CardDescription>
+            </div>
+            {!isEditing && (
+              <Button variant="outline" onClick={handleEdit} disabled={!!saving || !profile}>
+                Edit profile
+              </Button>
+            )}
           </CardHeader>
           <CardContent>
-            <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-                  <FormField
-                    control={form.control}
-                    name="full_name"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Full name</FormLabel>
-                        <FormControl>
-                          <Input {...field} placeholder="Your name" />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+            {isEditing ? (
+              <Form {...form}>
+                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                  <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                    <FormField
+                      control={form.control}
+                      name="full_name"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Full name</FormLabel>
+                          <FormControl>
+                            <Input {...field} placeholder="Your name" />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
 
-                  <FormField
-                    control={form.control}
-                    name="phone"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Phone</FormLabel>
-                        <FormControl>
-                          <Input {...field} placeholder="Contact number" />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                    <FormField
+                      control={form.control}
+                      name="phone"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Phone</FormLabel>
+                          <FormControl>
+                            <Input {...field} placeholder="Contact number" />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-end">
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      onClick={handleCancel}
+                      disabled={saving}
+                    >
+                      Cancel
+                    </Button>
+                    <Button type="submit" disabled={saving || !isDirty || !isValid}>
+                      {saving ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          Saving...
+                        </>
+                      ) : (
+                        'Save changes'
+                      )}
+                    </Button>
+                  </div>
+                </form>
+              </Form>
+            ) : (
+              <div className="space-y-8">
+                <div className="grid gap-6 sm:grid-cols-2">
+                  <div className="rounded-xl border bg-card p-5 shadow-sm">
+                    <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                      Full name
+                    </p>
+                    <p className="mt-2 text-lg font-medium text-foreground">{displayName}</p>
+                  </div>
+                  <div className="rounded-xl border bg-card p-5 shadow-sm">
+                    <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                      Phone number
+                    </p>
+                    <p className="mt-2 text-lg font-medium text-foreground">{displayPhone}</p>
+                  </div>
                 </div>
 
-                <div className="flex gap-4">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => form.reset()}
-                    disabled={saving}
-                  >
-                    Reset
-                  </Button>
-                  <Button type="submit" disabled={saving}>
-                    {saving ? (
-                      <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        Saving...
-                      </>
-                    ) : (
-                      'Save changes'
-                    )}
+                <div className="flex flex-col justify-between gap-4 rounded-xl bg-muted/60 p-5 sm:flex-row sm:items-center">
+                  <div>
+                    <p className="text-sm font-medium text-foreground">Need to make a change?</p>
+                    <p className="text-sm text-muted-foreground">
+                      You can update your details at any time. Changes take effect immediately after saving.
+                    </p>
+                  </div>
+                  <Button onClick={handleEdit} variant="default">
+                    Edit profile
                   </Button>
                 </div>
-              </form>
-            </Form>
+
+                {lastUpdated && (
+                  <p className="text-xs text-muted-foreground">
+                    Last updated {lastUpdated}
+                  </p>
+                )}
+              </div>
+            )}
           </CardContent>
         </Card>
       )}

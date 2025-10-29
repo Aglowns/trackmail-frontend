@@ -143,16 +143,13 @@ class ApiClient {
   }
 
   async createApplication(data: CreateApplicationRequest): Promise<Application> {
-    const response: AxiosResponse<{
-      status: string;
-      message: string;
-      application: Application;
-    }> = await this.client.post('/v1/applications', data);
-
-    if (response.data.status === 'success' && response.data.application) {
-      return response.data.application;
+    const response = await this.client.post('/v1/applications', data);
+    // Accept both legacy wrapper { status, application } and plain Application payloads
+    const payload = response.data as any;
+    if (payload && typeof payload === 'object') {
+      if (payload.application) return payload.application as Application;
+      if (payload.id && payload.company && payload.position) return payload as Application;
     }
-
     throw new Error('Failed to create application');
   }
 

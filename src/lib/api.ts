@@ -145,11 +145,19 @@ class ApiClient {
   async createApplication(data: CreateApplicationRequest): Promise<Application> {
     const response = await this.client.post('/v1/applications', data);
     // Accept both legacy wrapper { status, application } and plain Application payloads
-    const payload = response.data as any;
-    if (payload && typeof payload === 'object') {
-      if (payload.application) return payload.application as Application;
-      if (payload.id && payload.company && payload.position) return payload as Application;
-    }
+    const payload: unknown = response.data;
+
+    const hasKeys = (obj: unknown, keys: string[]): obj is Record<string, unknown> =>
+      typeof obj === 'object' && obj !== null && keys.every((k) => k in (obj as Record<string, unknown>));
+
+    const isApplication = (obj: unknown): obj is Application =>
+      hasKeys(obj, ['id', 'company', 'position']);
+
+    const isWrapped = (obj: unknown): obj is { application: Application } =>
+      hasKeys(obj, ['application']) && isApplication((obj as Record<string, unknown>).application);
+
+    if (isWrapped(payload)) return payload.application;
+    if (isApplication(payload)) return payload;
     throw new Error('Failed to create application');
   }
 

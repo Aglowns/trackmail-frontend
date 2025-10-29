@@ -18,19 +18,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 const applicationSchema = z.object({
   company: z.string().min(1, 'Company is required'),
   position: z.string().min(1, 'Position is required'),
-  status: z.enum([
-    'wishlist',
-    'applied',
-    'screening',
-    'interviewing',
-    'interview_scheduled',
-    'interview_completed',
-    'offer',
-    'offer_received',
-    'accepted',
-    'rejected',
-    'withdrawn',
-  ]),
+  status: z.enum(['applied', 'interviewing', 'offer', 'rejected', 'withdrawn']),
   location: z.string().optional(),
   source_url: z.string().url('Must be a valid URL').optional().or(z.literal('')),
   source: z.string().optional(),
@@ -43,15 +31,9 @@ const applicationSchema = z.object({
 type ApplicationFormData = z.infer<typeof applicationSchema>;
 
 const statusOptions: { value: ApplicationStatus; label: string }[] = [
-  { value: 'wishlist', label: 'Wishlist' },
   { value: 'applied', label: 'Applied' },
-  { value: 'screening', label: 'Screening' },
-  { value: 'interviewing', label: 'Interviewing' },
-  { value: 'interview_scheduled', label: 'Interview Scheduled' },
-  { value: 'interview_completed', label: 'Interview Completed' },
+  { value: 'interviewing', label: 'Interviewed' },
   { value: 'offer', label: 'Offer' },
-  { value: 'offer_received', label: 'Offer Received' },
-  { value: 'accepted', label: 'Accepted' },
   { value: 'rejected', label: 'Rejected' },
   { value: 'withdrawn', label: 'Withdrawn' },
 ];
@@ -61,8 +43,6 @@ const confidenceOptions = [
   { value: 'Medium', label: 'Medium' },
   { value: 'Low', label: 'Low' },
 ];
-
-const sourceOptions = ['LinkedIn', 'Company Website', 'Recruiter', 'Referral', 'Job Board', 'Other'];
 
 interface ApplicationFormProps {
   application?: Application;
@@ -214,20 +194,9 @@ export function ApplicationForm({
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Source</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select source" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {sourceOptions.map((option) => (
-                          <SelectItem key={option} value={option}>
-                            {option}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <FormControl>
+                      <Input placeholder="e.g., LinkedIn, Referral" {...field} />
+                    </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}

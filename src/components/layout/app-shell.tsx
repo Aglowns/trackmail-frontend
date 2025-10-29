@@ -8,13 +8,6 @@ import { Search, ChevronDown, Menu, X } from 'lucide-react';
 import { useAuth } from '@/components/auth/auth-provider';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import { ThemeToggle } from '@/components/theme-toggle';
 
 const navItems = [
@@ -22,16 +15,6 @@ const navItems = [
   { label: 'Applications', href: '/applications' },
   { label: 'Analytics', href: '/analytics' },
   { label: 'Settings', href: '/settings' },
-];
-
-const professionOptions = [
-  'All Professions',
-  'Engineering',
-  'Design',
-  'Product',
-  'Marketing',
-  'Sales',
-  'Operations',
 ];
 
 function initialsFromEmail(email?: string | null) {
@@ -44,7 +27,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
   const { user, signOut } = useAuth();
-  const [profession, setProfession] = useState(professionOptions[0]);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
   useEffect(() => {
@@ -71,8 +53,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <div className="min-h-screen bg-slate-100 text-slate-900">
-      <header className="border-b border-slate-200 bg-white">
+    <div className="min-h-screen bg-background text-foreground transition-colors">
+      <header className="border-b border-border bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/85">
         <div className="mx-auto flex h-16 max-w-7xl items-center gap-6 px-4 sm:h-20 sm:px-6 lg:px-8">
           <Link href="/dashboard" className="text-lg font-semibold tracking-tight sm:text-2xl">
             TrackMail
@@ -80,14 +62,14 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
           <button
             type="button"
-            className="inline-flex items-center justify-center rounded-full border border-slate-200 p-2 text-slate-600 transition hover:border-slate-300 hover:text-slate-900 md:hidden"
+            className="inline-flex items-center justify-center rounded-full border border-border p-2 text-muted-foreground transition hover:border-primary/40 hover:text-foreground md:hidden"
             onClick={() => setMobileNavOpen((prev) => !prev)}
             aria-label="Toggle navigation"
           >
             {mobileNavOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </button>
 
-          <nav className="hidden items-center gap-6 text-sm font-medium text-slate-600 md:flex">
+          <nav className="hidden items-center gap-6 text-sm font-medium text-muted-foreground md:flex">
             {navItems.map(({ label, href }) => {
               const isActive =
                 pathname === href || (href !== '/dashboard' && pathname.startsWith(href));
@@ -95,8 +77,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 <Link
                   key={href}
                   href={href}
-                  className={`transition hover:text-slate-900 ${
-                    isActive ? 'text-slate-900' : 'text-slate-600'
+                  className={`transition hover:text-foreground ${
+                    isActive ? 'text-foreground' : 'text-muted-foreground'
                   }`}
                 >
                   {label}
@@ -107,26 +89,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
           <div className="ml-auto flex flex-1 items-center justify-end gap-3">
             <div className="relative hidden max-w-sm flex-1 items-center md:flex">
-              <Search className="pointer-events-none absolute left-3 h-4 w-4 text-slate-400" />
+              <Search className="pointer-events-none absolute left-3 h-4 w-4 text-muted-foreground/60" />
               <Input
                 placeholder="Search applications..."
-                className="w-full rounded-full border-slate-200 bg-slate-100/80 pl-10 text-sm"
+                className="w-full rounded-full border border-border bg-muted/70 pl-10 text-sm text-foreground placeholder:text-muted-foreground/70"
               />
-            </div>
-
-            <div className="hidden items-center gap-3 md:flex">
-              <Select value={profession} onValueChange={setProfession}>
-                <SelectTrigger className="w-40 rounded-full border-slate-200 bg-slate-100/80 text-sm font-medium text-slate-600">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent className="text-sm">
-                  {professionOptions.map((option) => (
-                    <SelectItem key={option} value={option}>
-                      {option}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
             </div>
 
             <ThemeToggle />
@@ -140,12 +107,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       </header>
 
       {mobileNavOpen && (
-        <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm md:hidden">
-          <div className="absolute inset-x-4 top-20 rounded-2xl border border-slate-200 bg-white p-4 shadow-xl">
+        <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm md:hidden">
+          <div className="absolute inset-x-4 top-20 rounded-2xl border border-border bg-card p-4 shadow-xl">
             <div className="space-y-4">
               <div className="flex flex-col gap-1">
-                <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">Navigation</p>
-                <nav className="flex flex-col gap-1 text-sm">
+                <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Navigation</p>
+                <nav className="flex flex-col gap-1 text-sm text-muted-foreground">
                   {navItems.map(({ label, href }) => {
                     const isActive =
                       pathname === href || (href !== '/dashboard' && pathname.startsWith(href));
@@ -154,7 +121,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                         key={href}
                         href={href}
                         className={`rounded-lg px-3 py-2 transition ${
-                          isActive ? 'bg-slate-100 text-slate-900' : 'text-slate-600 hover:bg-slate-50'
+                          isActive ? 'bg-muted text-foreground' : 'hover:bg-muted'
                         }`}
                       >
                         {label}
@@ -164,32 +131,14 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 </nav>
               </div>
 
-              <div className="space-y-2">
-                <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">
-                  Profession Filter
-                </p>
-                <Select value={profession} onValueChange={setProfession}>
-                  <SelectTrigger className="w-full rounded-full border-slate-200 bg-slate-100/80 text-sm font-medium text-slate-600">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent className="text-sm">
-                    {professionOptions.map((option) => (
-                      <SelectItem key={option} value={option}>
-                        {option}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-2 rounded-xl border border-slate-200 p-3">
-                <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">
+              <div className="space-y-2 rounded-xl border border-border p-3">
+                <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                   Account
                 </p>
-                <p className="truncate text-sm font-medium text-slate-900">{user?.email ?? 'Signed in'}</p>
+                <p className="truncate text-sm font-medium text-foreground">{user?.email ?? 'Signed in'}</p>
                 <Button
                   variant="outline"
-                  className="w-full border-slate-200 text-slate-700 hover:bg-slate-100"
+                  className="w-full border-border text-foreground hover:bg-muted"
                   onClick={async () => {
                     await handleSignOut();
                     setMobileNavOpen(false);
@@ -244,27 +193,27 @@ function ProfileMenu({
       <button
         type="button"
         onClick={() => setOpen((prev) => !prev)}
-        className="flex items-center gap-2 rounded-full border border-slate-200 bg-white px-2 py-1 pl-1 pr-3 text-sm font-medium text-slate-700 shadow-sm transition hover:border-slate-300 hover:text-slate-900"
+        className="flex items-center gap-2 rounded-full border border-border bg-card px-2 py-1 pl-1 pr-3 text-sm font-medium text-foreground shadow-sm transition hover:border-primary/40"
       >
-        <span className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-900 text-xs font-semibold text-white">
+        <span className="flex h-8 w-8 items-center justify-center rounded-full bg-foreground text-xs font-semibold text-background">
           {initials}
         </span>
-        <ChevronDown className="h-4 w-4 text-slate-400" />
+        <ChevronDown className="h-4 w-4 text-muted-foreground" />
       </button>
 
       {open && (
-        <div className="absolute right-0 mt-2 w-44 rounded-xl border border-slate-200 bg-white p-2 text-sm shadow-lg">
-          <p className="px-2 py-2 text-xs font-semibold uppercase tracking-wider text-slate-500">
+        <div className="absolute right-0 mt-2 w-44 rounded-xl border border-border bg-card p-2 text-sm shadow-lg">
+          <p className="px-2 py-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
             Account
           </p>
-          <div className="rounded-lg p-2 text-slate-600">
-            <p className="truncate text-sm font-medium text-slate-900">{email ?? 'Account'}</p>
-            <p className="text-xs text-slate-500">Signed in</p>
+          <div className="rounded-lg p-2 text-muted-foreground">
+            <p className="truncate text-sm font-medium text-foreground">{email ?? 'Account'}</p>
+            <p className="text-xs text-muted-foreground/80">Signed in</p>
           </div>
           <Button
             variant="outline"
             size="sm"
-            className="mt-1 w-full border-slate-200 text-slate-700 hover:bg-slate-100"
+            className="mt-1 w-full border-border text-foreground hover:bg-muted"
             onClick={async () => {
               await onSignOut();
               setOpen(false);

@@ -496,7 +496,7 @@ export default function LandingPage() {
             </div>
           </div>
         </section>
-      </main>
+        </main>
 
       <footer className="border-t border-slate-200 bg-white/80 transition-colors dark:border-slate-800 dark:bg-slate-950/80">
         <div className="mx-auto grid max-w-6xl gap-8 px-4 py-16 text-sm text-slate-600 transition dark:text-slate-300 sm:grid-cols-2 md:grid-cols-4 sm:px-6 lg:px-8">
@@ -552,6 +552,6 @@ export default function LandingPage() {
           </div>
         </div>
       </footer>
-    </div>
+      </div>
   );
 }

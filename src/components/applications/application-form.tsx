@@ -3,17 +3,15 @@
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import {
-  Application,
-  ApplicationStatus,
-  CreateApplicationRequest,
-} from '@/types/application';
+import { Application, ApplicationStatus, CreateApplicationRequest } from '@/types/application';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+
+type SimpleStatus = 'applied' | 'interviewing' | 'offer' | 'rejected' | 'withdrawn';
 
 const applicationSchema = z.object({
   company: z.string().min(1, 'Company is required'),
@@ -30,7 +28,7 @@ const applicationSchema = z.object({
 
 type ApplicationFormData = z.infer<typeof applicationSchema>;
 
-const statusOptions: { value: ApplicationStatus; label: string }[] = [
+const statusOptions: { value: SimpleStatus; label: string }[] = [
   { value: 'applied', label: 'Applied' },
   { value: 'interviewing', label: 'Interviewed' },
   { value: 'offer', label: 'Offer' },
@@ -57,12 +55,35 @@ export function ApplicationForm({
   loading = false, 
   submitText = 'Create Application' 
 }: ApplicationFormProps) {
+  function toSimpleStatus(status: ApplicationStatus | undefined): SimpleStatus {
+    switch (status) {
+      case 'interviewing':
+      case 'interview_scheduled':
+      case 'interview_completed':
+        return 'interviewing';
+      case 'screening':
+      case 'applied':
+      case 'wishlist':
+        return 'applied';
+      case 'offer':
+      case 'offer_received':
+      case 'accepted':
+        return 'offer';
+      case 'rejected':
+        return 'rejected';
+      case 'withdrawn':
+        return 'withdrawn';
+      default:
+        return 'applied';
+    }
+  }
+
   const form = useForm<ApplicationFormData>({
     resolver: zodResolver(applicationSchema),
     defaultValues: {
       company: application?.company || '',
       position: application?.position || '',
-      status: application?.status || 'applied',
+      status: toSimpleStatus(application?.status),
       location: application?.location || '',
       source_url: application?.source_url || '',
       source: application?.source || '',

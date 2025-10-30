@@ -86,22 +86,31 @@ export default function SettingsPage() {
         
         // Get refresh token from Supabase session
         const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+        console.log('=== REFRESH TOKEN DEBUG ===');
         console.log('Session data:', sessionData);
         console.log('Session error:', sessionError);
+        console.log('Full session object:', JSON.stringify(sessionData.session, null, 2));
         
         if (sessionData.session?.refresh_token) {
-          console.log('Refresh token found, length:', sessionData.session.refresh_token.length);
-          setRefreshToken(sessionData.session.refresh_token);
+          const token = sessionData.session.refresh_token;
+          console.log('Refresh token found!');
+          console.log('Token length:', token.length);
+          console.log('Token (first 20 chars):', token.substring(0, 20));
+          console.log('Token (last 20 chars):', token.substring(token.length - 20));
+          console.log('Full token:', token);
+          setRefreshToken(token);
         } else {
-          console.error('No refresh token in session');
-          console.log('Session object:', sessionData.session);
+          console.error('❌ No refresh token in session');
+          console.log('Session object keys:', Object.keys(sessionData.session || {}));
           
           // Fallback: try to get from access token
           if (sessionData.session?.access_token) {
-            console.log('Using access token as fallback (NOT RECOMMENDED)');
+            console.warn('⚠️ Using access token as fallback (NOT RECOMMENDED)');
+            console.log('Access token length:', sessionData.session.access_token.length);
             setRefreshToken(sessionData.session.access_token);
           }
         }
+        console.log('=== END DEBUG ===');
       } catch (error) {
         console.error(error);
         toast.error('Failed to load profile');

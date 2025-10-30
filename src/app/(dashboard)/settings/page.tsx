@@ -84,31 +84,53 @@ export default function SettingsPage() {
         form.reset(mapProfileToForm(data));
         setIsEditing(false);
         
-        // Get refresh token from Supabase session
-        const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
-        console.log('=== REFRESH TOKEN DEBUG ===');
-        console.log('Session data:', sessionData);
-        console.log('Session error:', sessionError);
-        console.log('Full session object:', JSON.stringify(sessionData.session, null, 2));
+        // Get access token - try backend endpoint first (most reliable)
+        console.log('=== TOKEN DEBUG ===');
         
-        if (sessionData.session?.refresh_token) {
-          const token = sessionData.session.refresh_token;
-          console.log('Refresh token found!');
-          console.log('Token length:', token.length);
-          console.log('Token (first 20 chars):', token.substring(0, 20));
-          console.log('Token (last 20 chars):', token.substring(token.length - 20));
-          console.log('Full token:', token);
-          setRefreshToken(token);
-        } else {
-          console.error('❌ No refresh token in session');
-          console.log('Session object keys:', Object.keys(sessionData.session || {}));
+        let token: string | null = null;
+        
+        // Method 1: Get token from backend API (most reliable - uses actual Authorization header)
+        try {
+          console.log('Trying backend endpoint /v1/auth/token...');
+          token = await apiClient.getAccessToken();
+          console.log('✅ Token from backend:', {
+            length: token.length,
+            startsWith: token.substring(0, 20),
+            isValid: token.startsWith('eyJ') && token.length > 100
+          });
+        } catch (error) {
+          console.warn('Backend endpoint failed, trying Supabase session:', error);
           
-          // Fallback: try to get from access token
-          if (sessionData.session?.access_token) {
-            console.warn('⚠️ Using access token as fallback (NOT RECOMMENDED)');
-            console.log('Access token length:', sessionData.session.access_token.length);
-            setRefreshToken(sessionData.session.access_token);
+          // Method 2: Fallback to Supabase session
+          try {
+            const { data: sessionData } = await supabase.auth.getSession();
+            if (sessionData.session?.access_token) {
+              token = sessionData.session.access_token;
+              console.log('✅ Token from Supabase session:', {
+                length: token.length,
+                startsWith: token.substring(0, 20)
+              });
+            }
+          } catch (sessionError) {
+            console.error('❌ Both methods failed:', sessionError);
           }
+        }
+        
+        // Validate and set token
+        if (token) {
+          if (token.startsWith('eyJ') && token.length > 100) {
+            setRefreshToken(token);
+            console.log('✅ Valid JWT token set successfully');
+          } else {
+            console.error('❌ Invalid token format:', {
+              length: token.length,
+              startsWith: token.substring(0, 10)
+            });
+            toast.error('Invalid token format. Please log out and log in again.');
+          }
+        } else {
+          console.error('❌ No token available from any source');
+          toast.error('Failed to get authentication token. Please log out and log in again.');
         }
         console.log('=== END DEBUG ===');
       } catch (error) {
@@ -317,7 +339,7 @@ export default function SettingsPage() {
               <div className="mb-2">
                 <p className="text-sm font-medium text-foreground">Your Connection Token</p>
                 <p className="text-sm text-muted-foreground">
-                  Copy this token and paste it into the Gmail add-on to connect your account. <strong>You only need to do this once!</strong>
+                  Copy this token and paste it into the Gmail add-on to connect your account.
                 </p>
               </div>
               
@@ -362,8 +384,8 @@ export default function SettingsPage() {
                   <Alert>
                     <Info className="h-4 w-4" />
                     <AlertDescription className="text-sm">
-                      This token allows the Gmail add-on to automatically sync your job application emails. 
-                      It refreshes itself automatically, so you never have to do this again after the initial setup.
+                      This is your authentication token that allows the Gmail add-on to sync with your account. 
+                      The token expires after 1 hour, but the add-on will automatically refresh it in the background.
                     </AlertDescription>
                   </Alert>
                 </div>
@@ -388,17 +410,17 @@ export default function SettingsPage() {
               </ol>
             </div>
 
-            <div className="flex items-start gap-3 rounded-xl border-l-4 border-emerald-500 bg-emerald-50 p-4 dark:bg-emerald-950/30">
-              <div className="text-emerald-600 dark:text-emerald-400">
-                ✨
+            <div className="flex items-start gap-3 rounded-xl border-l-4 border-blue-500 bg-blue-50 p-4 dark:bg-blue-950/30">
+              <div className="text-blue-600 dark:text-blue-400">
+                ℹ️
               </div>
               <div>
-                <p className="text-sm font-medium text-emerald-900 dark:text-emerald-100">
-                  One-time setup, works forever!
+                <p className="text-sm font-medium text-blue-900 dark:text-blue-100">
+                  Token Auto-Refresh
                 </p>
-                <p className="mt-1 text-sm text-emerald-700 dark:text-emerald-300">
-                  After connecting once, the token automatically refreshes itself in the background. 
-                  You&apos;ll never need to copy it again unless you disconnect the add-on.
+                <p className="mt-1 text-sm text-blue-700 dark:text-blue-300">
+                  This token expires after 1 hour, but the add-on will automatically request a new one 
+                  when needed. You&apos;ll stay connected as long as you remain logged in to TrackMail.
                 </p>
               </div>
             </div>

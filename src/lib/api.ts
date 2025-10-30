@@ -231,6 +231,13 @@ class ApiClient {
     const response = await this.client.get('/v1/health');
     return response.data;
   }
+
+  // Get current access token from backend
+  // This is more reliable than getting from Supabase session directly
+  async getAccessToken(): Promise<string> {
+    const response = await this.client.get<{ access_token: string; token_type: string }>('/v1/auth/token');
+    return response.data.access_token;
+  }
 }
 
 // Export singleton instance

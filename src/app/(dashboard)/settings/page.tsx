@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Loader2, Copy, Check, Info } from 'lucide-react';
+import { Loader2, Copy, Check, Info, Eye, EyeOff } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -62,6 +62,7 @@ export default function SettingsPage() {
   const [isEditing, setIsEditing] = useState(false);
   const [refreshToken, setRefreshToken] = useState<string | null>(null);
   const [tokenCopied, setTokenCopied] = useState(false);
+  const [showToken, setShowToken] = useState(false);
 
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileSchema),
@@ -301,12 +302,26 @@ export default function SettingsPage() {
               {refreshToken ? (
                 <div className="space-y-3">
                   <div className="flex gap-2">
-                    <Input
-                      readOnly
-                      value={refreshToken}
-                      className="font-mono text-xs"
-                      type="password"
-                    />
+                    <div className="relative flex-1">
+                      <Input
+                        readOnly
+                        value={refreshToken}
+                        className="font-mono text-xs pr-10"
+                        type={showToken ? "text" : "password"}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowToken(!showToken)}
+                        className="absolute right-2 top-1/2 -translate-y-1/2 p-1 hover:bg-gray-100 rounded"
+                        aria-label={showToken ? "Hide token" : "Show token"}
+                      >
+                        {showToken ? (
+                          <EyeOff className="h-4 w-4 text-gray-500" />
+                        ) : (
+                          <Eye className="h-4 w-4 text-gray-500" />
+                        )}
+                      </button>
+                    </div>
                     <Button onClick={handleCopyToken} variant="outline" size="default">
                       {tokenCopied ? (
                         <>

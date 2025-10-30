@@ -85,9 +85,22 @@ export default function SettingsPage() {
         setIsEditing(false);
         
         // Get refresh token from Supabase session
-        const { data: sessionData } = await supabase.auth.getSession();
+        const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+        console.log('Session data:', sessionData);
+        console.log('Session error:', sessionError);
+        
         if (sessionData.session?.refresh_token) {
+          console.log('Refresh token found, length:', sessionData.session.refresh_token.length);
           setRefreshToken(sessionData.session.refresh_token);
+        } else {
+          console.error('No refresh token in session');
+          console.log('Session object:', sessionData.session);
+          
+          // Fallback: try to get from access token
+          if (sessionData.session?.access_token) {
+            console.log('Using access token as fallback (NOT RECOMMENDED)');
+            setRefreshToken(sessionData.session.access_token);
+          }
         }
       } catch (error) {
         console.error(error);

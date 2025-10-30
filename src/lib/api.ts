@@ -225,6 +225,12 @@ class ApiClient {
   async deleteEvent(id: string): Promise<void> {
     await this.client.delete(`/v1/events/${id}`);
   }
+
+  // Health check endpoint (for diagnostics)
+  async checkHealth(): Promise<{ status: string; version?: string; timestamp?: string }> {
+    const response = await this.client.get('/v1/health');
+    return response.data;
+  }
 }
 
 // Export singleton instance

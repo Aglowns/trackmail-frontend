@@ -23,8 +23,8 @@ export default function DiagnosticsPage() {
     try {
       // 1) Health (versioned)
       try {
-        const res = await apiClient.client.get('/v1/health');
-        checks.push({ name: 'Backend /health', ok: res.status === 200, details: JSON.stringify(res.data) });
+        const data = await apiClient.checkHealth();
+        checks.push({ name: 'Backend /health', ok: true, details: JSON.stringify(data) });
       } catch (e: unknown) {
         checks.push({ name: 'Backend /health', ok: false, details: String(e) });
       }

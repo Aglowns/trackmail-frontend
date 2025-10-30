@@ -343,11 +343,11 @@ export default function SettingsPage() {
             <div className="rounded-xl bg-muted/60 p-5">
               <p className="mb-2 text-sm font-medium text-foreground">Setup Instructions:</p>
               <ol className="list-decimal space-y-2 pl-5 text-sm text-muted-foreground">
-                <li>Copy the token above by clicking the "Copy" button</li>
+                <li>Copy the token above by clicking the &quot;Copy&quot; button</li>
                 <li>Open Gmail and click the TrackMail add-on icon in the sidebar</li>
-                <li>Click "Get Started" and then "Paste Token"</li>
-                <li>Paste the token and click "Connect"</li>
-                <li>That's it! The add-on will now work automatically forever</li>
+                <li>Click &quot;Get Started&quot; and then &quot;Paste Token&quot;</li>
+                <li>Paste the token and click &quot;Connect&quot;</li>
+                <li>That&apos;s it! The add-on will now work automatically forever</li>
               </ol>
             </div>
 
@@ -361,7 +361,7 @@ export default function SettingsPage() {
                 </p>
                 <p className="mt-1 text-sm text-emerald-700 dark:text-emerald-300">
                   After connecting once, the token automatically refreshes itself in the background. 
-                  You'll never need to copy it again unless you disconnect the add-on.
+                  You&apos;ll never need to copy it again unless you disconnect the add-on.
                 </p>
               </div>
             </div>

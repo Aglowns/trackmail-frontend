@@ -84,55 +84,21 @@ export default function SettingsPage() {
         form.reset(mapProfileToForm(data));
         setIsEditing(false);
         
-        // Get access token - try backend endpoint first (most reliable)
-        console.log('=== TOKEN DEBUG ===');
-        
-        let token: string | null = null;
-        
-        // Method 1: Get token from backend API (most reliable - uses actual Authorization header)
+        // Get or create long-lived installation token (one-time)
+        console.log('=== INSTALLATION TOKEN DEBUG ===');
         try {
-          console.log('Trying backend endpoint /v1/auth/token...');
-          token = await apiClient.getAccessToken();
-          console.log('✅ Token from backend:', {
-            length: token.length,
-            startsWith: token.substring(0, 20),
-            isValid: token.startsWith('eyJ') && token.length > 100
-          });
-        } catch (error) {
-          console.warn('Backend endpoint failed, trying Supabase session:', error);
-          
-          // Method 2: Fallback to Supabase session
+          const instToken = await apiClient.getInstallationToken();
+          setRefreshToken(instToken);
+          console.log('✅ Installation token issued');
+        } catch (e) {
+          console.error('❌ Failed to get installation token, falling back to access token', e);
           try {
-            const { data: sessionData } = await supabase.auth.getSession();
-            if (sessionData.session?.access_token) {
-              token = sessionData.session.access_token;
-              console.log('✅ Token from Supabase session:', {
-                length: token.length,
-                startsWith: token.substring(0, 20)
-              });
-            }
-          } catch (sessionError) {
-            console.error('❌ Both methods failed:', sessionError);
-          }
-        }
-        
-        // Validate and set token
-        if (token) {
-          if (token.startsWith('eyJ') && token.length > 100) {
+            const token = await apiClient.getAccessToken();
             setRefreshToken(token);
-            console.log('✅ Valid JWT token set successfully');
-          } else {
-            console.error('❌ Invalid token format:', {
-              length: token.length,
-              startsWith: token.substring(0, 10)
-            });
-            toast.error('Invalid token format. Please log out and log in again.');
+          } catch (e2) {
+            toast.error('Failed to get token');
           }
-        } else {
-          console.error('❌ No token available from any source');
-          toast.error('Failed to get authentication token. Please log out and log in again.');
         }
-        console.log('=== END DEBUG ===');
       } catch (error) {
         console.error(error);
         toast.error('Failed to load profile');
@@ -337,9 +303,9 @@ export default function SettingsPage() {
           <CardContent className="space-y-6">
             <div>
               <div className="mb-2">
-                <p className="text-sm font-medium text-foreground">Your Connection Token</p>
+                <p className="text-sm font-medium text-foreground">Your Installation Token</p>
                 <p className="text-sm text-muted-foreground">
-                  Copy this token and paste it into the Gmail add-on to connect your account.
+                  Copy this token and paste it into the Gmail add-on to connect your account. This is a one-time action.
                 </p>
               </div>
               
@@ -384,8 +350,7 @@ export default function SettingsPage() {
                   <Alert>
                     <Info className="h-4 w-4" />
                     <AlertDescription className="text-sm">
-                      This is your authentication token that allows the Gmail add-on to sync with your account. 
-                      The token expires after 1 hour, but the add-on will automatically refresh it in the background.
+                      This is a long-lived installation token. Paste it once into the Gmail add-on and it will keep working automatically.
                     </AlertDescription>
                   </Alert>
                 </div>
@@ -406,7 +371,7 @@ export default function SettingsPage() {
                 <li>Open Gmail and click the TrackMail add-on icon in the sidebar</li>
                 <li>Click &quot;Get Started&quot; and then &quot;Paste Token&quot;</li>
                 <li>Paste the token and click &quot;Connect&quot;</li>
-                <li>That&apos;s it! The add-on will now work automatically forever</li>
+                <li>That&apos;s it! You won&apos;t need to paste a token again.</li>
               </ol>
             </div>
 
@@ -416,11 +381,10 @@ export default function SettingsPage() {
               </div>
               <div>
                 <p className="text-sm font-medium text-blue-900 dark:text-blue-100">
-                  Token Auto-Refresh
+                  One-time Setup
                 </p>
                 <p className="mt-1 text-sm text-blue-700 dark:text-blue-300">
-                  This token expires after 1 hour, but the add-on will automatically request a new one 
-                  when needed. You&apos;ll stay connected as long as you remain logged in to TrackMail.
+                  This token is designed for one-time installation. The add-on will use it automatically; you won&apos;t need to copy new tokens.
                 </p>
               </div>
             </div>

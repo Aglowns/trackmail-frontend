@@ -238,6 +238,14 @@ class ApiClient {
     const response = await this.client.get<{ access_token: string; token_type: string }>('/v1/auth/token');
     return response.data.access_token;
   }
+
+  // Get or issue a long-lived installation token for the Gmail add-on
+  async getInstallationToken(): Promise<string> {
+    const response = await this.client.post<{ installation_token: string; token_type: string; expires_in_days: number }>(
+      '/v1/auth/installation-token'
+    );
+    return response.data.installation_token;
+  }
 }
 
 // Export singleton instance

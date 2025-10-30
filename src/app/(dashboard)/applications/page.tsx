@@ -10,7 +10,13 @@ import { Application, ApplicationFilters, ApplicationStatus } from '@/types/appl
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import {
   Table,
   TableBody,
@@ -22,28 +28,21 @@ import {
 
 const statusOptions: { value: ApplicationStatus | 'all'; label: string }[] = [
   { value: 'all', label: 'All Statuses' },
+  { value: 'wishlist', label: 'Wishlist' },
   { value: 'applied', label: 'Applied' },
-  { value: 'interviewing', label: 'Interviewed' },
+  { value: 'screening', label: 'In Review' },
+  { value: 'interviewing', label: 'Interviewing' },
+  { value: 'interview_scheduled', label: 'Interview Scheduled' },
+  { value: 'interview_completed', label: 'Interview Completed' },
   { value: 'offer', label: 'Offer' },
+  { value: 'offer_received', label: 'Offer Received' },
+  { value: 'accepted', label: 'Accepted' },
   { value: 'rejected', label: 'Rejected' },
   { value: 'withdrawn', label: 'Withdrawn' },
 ];
 
+const sources = ['All Sources', 'LinkedIn', 'Company', 'Indeed', 'Referral', 'Glassdoor'];
 const dateRanges = ['Date Applied', 'Last Updated'];
-
-const STATUS_LABELS: Record<ApplicationStatus, string> = {
-  wishlist: 'Wishlist',
-  applied: 'Applied',
-  screening: 'Applied',
-  interviewing: 'Interviewed',
-  interview_scheduled: 'Interviewed',
-  interview_completed: 'Interviewed',
-  offer: 'Offer',
-  offer_received: 'Offer',
-  rejected: 'Rejected',
-  accepted: 'Offer',
-  withdrawn: 'Withdrawn',
-};
 
 export default function ApplicationsPage() {
   const [loading, setLoading] = useState(false);
@@ -90,8 +89,8 @@ export default function ApplicationsPage() {
     <div className="space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight">All Applications</h1>
-          <p className="text-sm text-muted-foreground">Manage and track all your job applications</p>
+          <h1 className="text-2xl font-semibold tracking-tight text-slate-900">All Applications</h1>
+          <p className="text-sm text-slate-500">Manage and track all your job applications</p>
         </div>
         <div className="flex w-full items-center gap-3 sm:w-auto">
           <Button variant="outline" className="flex items-center gap-2" onClick={handleExport}>
@@ -105,20 +104,38 @@ export default function ApplicationsPage() {
         </div>
       </div>
 
-      <Card className="shadow-sm">
+      <Card className="border-none bg-white shadow-sm">
         <CardContent className="space-y-6 p-4 sm:p-6">
-          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
             <Select
               value={filters.status ?? 'all'}
               onValueChange={(value) => setFilters((prev) => ({ ...prev, status: value as ApplicationStatus | 'all' }))}
             >
-              <SelectTrigger className="h-11 rounded-xl border border-border bg-muted/60 text-sm">
+              <SelectTrigger className="h-11 rounded-xl border-slate-200 bg-slate-50 text-sm">
                 <SelectValue placeholder="All Statuses" />
               </SelectTrigger>
               <SelectContent>
                 {statusOptions.map((option) => (
                   <SelectItem key={option.value} value={option.value}>
                     {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            <Select
+              value={filters.source ?? 'All Sources'}
+              onValueChange={(value) =>
+                setFilters((prev) => ({ ...prev, source: value === 'All Sources' ? undefined : value }))
+              }
+            >
+              <SelectTrigger className="h-11 rounded-xl border-slate-200 bg-slate-50 text-sm">
+                <SelectValue placeholder="All Sources" />
+              </SelectTrigger>
+              <SelectContent>
+                {sources.map((source) => (
+                  <SelectItem key={source} value={source}>
+                    {source}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -134,7 +151,7 @@ export default function ApplicationsPage() {
                 }))
               }
             >
-              <SelectTrigger className="h-11 rounded-xl border border-border bg-muted/60 text-sm">
+              <SelectTrigger className="h-11 rounded-xl border-slate-200 bg-slate-50 text-sm">
                 <SelectValue placeholder="Date Applied" />
               </SelectTrigger>
               <SelectContent>
@@ -147,8 +164,8 @@ export default function ApplicationsPage() {
               </SelectContent>
             </Select>
 
-            <div className="flex items-center gap-2 rounded-xl border border-border bg-muted/60 px-3">
-              <Filter className="h-4 w-4 text-muted-foreground/70" />
+            <div className="flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3">
+              <Filter className="h-4 w-4 text-slate-400" />
               <Input
                 placeholder="Search applications..."
                 className="h-10 border-none bg-transparent text-sm"
@@ -160,9 +177,9 @@ export default function ApplicationsPage() {
             </div>
           </div>
 
-          <div className="-mx-4 overflow-x-auto rounded-2xl border border-border sm:mx-0">
+          <div className="-mx-4 overflow-x-auto rounded-2xl border border-slate-200 sm:mx-0">
             <Table className="min-w-[720px] sm:min-w-full">
-              <TableHeader className="bg-muted/60">
+              <TableHeader className="bg-slate-50">
                 <TableRow>
                   <TableHead className="w-12">
                     <input type="checkbox" className="h-4 w-4 rounded border-slate-300" />
@@ -180,7 +197,7 @@ export default function ApplicationsPage() {
               <TableBody>
                 {loading ? (
                   <TableRow>
-                    <TableCell colSpan={9} className="py-12 text-center text-muted-foreground">
+                    <TableCell colSpan={9} className="py-12 text-center text-slate-500">
                       <div className="flex items-center justify-center gap-2">
                         <Loader2 className="h-5 w-5 animate-spin" /> Loading applications...
                       </div>
@@ -188,19 +205,19 @@ export default function ApplicationsPage() {
                   </TableRow>
                 ) : applications.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={9} className="py-12 text-center text-muted-foreground">
+                    <TableCell colSpan={9} className="py-12 text-center text-slate-500">
                       No applications found. Adjust filters or add a new application.
                     </TableCell>
                   </TableRow>
                 ) : (
                   applications.map((application) => (
-                    <TableRow key={application.id} className="hover:bg-muted/40">
+                    <TableRow key={application.id} className="hover:bg-slate-50">
                       <TableCell>
                         <input type="checkbox" className="h-4 w-4 rounded border-slate-300" />
                       </TableCell>
-                      <TableCell className="font-medium">
+                      <TableCell className="font-medium text-slate-900">
                         <div className="flex items-center gap-3">
-                          <span className="flex h-9 w-9 items-center justify-center rounded-full bg-muted text-xs font-semibold text-muted-foreground">
+                          <span className="flex h-9 w-9 items-center justify-center rounded-full bg-slate-100 text-xs font-semibold text-slate-600">
                             {application.company?.charAt(0).toUpperCase() ?? '?'}
                           </span>
                           {application.company}
@@ -209,8 +226,8 @@ export default function ApplicationsPage() {
                       <TableCell>{application.position}</TableCell>
                       <TableCell>{application.location ?? '—'}</TableCell>
                       <TableCell>
-                        <span className="rounded-full bg-muted px-2 py-1 text-xs font-semibold text-muted-foreground">
-                          {STATUS_LABELS[application.status] ?? application.status.replace('_', ' ')}
+                        <span className="rounded-full bg-slate-100 px-2 py-1 text-xs font-semibold text-slate-600">
+                          {application.status.replace('_', ' ')}
                         </span>
                       </TableCell>
                       <TableCell>
@@ -219,13 +236,13 @@ export default function ApplicationsPage() {
                           : '—'}
                       </TableCell>
                       <TableCell>
-                        <span className="text-sm text-muted-foreground">{application.confidence ?? '—'}</span>
+                        <span className="text-sm text-slate-500">{application.confidence ?? '—'}</span>
                       </TableCell>
                       <TableCell>{application.source ?? '—'}</TableCell>
                       <TableCell className="text-right">
                         <Link
                           href={`/applications/${application.id}`}
-                          className="text-sm font-medium text-primary hover:text-primary/80"
+                          className="text-sm font-medium text-indigo-600 hover:text-indigo-700"
                         >
                           View
                         </Link>
@@ -236,7 +253,7 @@ export default function ApplicationsPage() {
               </TableBody>
             </Table>
           </div>
-          <div className="text-xs text-muted-foreground">
+          <div className="text-xs text-slate-500">
             Showing {applications.length} applications
           </div>
         </CardContent>

@@ -14,16 +14,38 @@ const COLUMN_CONFIG: Array<{
   statuses: ApplicationStatus[];
   title: string;
   indicator: string;
+  headerColor: string;
 }> = [
-  { statuses: ['applied'], title: 'Applied', indicator: 'bg-muted text-foreground' },
+  { 
+    statuses: ['applied'], 
+    title: 'Applied', 
+    indicator: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300',
+    headerColor: 'border-t-4 border-t-blue-500'
+  },
   {
     statuses: ['interviewing', 'interview_scheduled', 'interview_completed', 'screening'],
     title: 'Interviewed',
-    indicator: 'bg-muted text-foreground',
+    indicator: 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300',
+    headerColor: 'border-t-4 border-t-purple-500'
   },
-  { statuses: ['offer', 'offer_received', 'accepted'], title: 'Offer', indicator: 'bg-muted text-foreground' },
-  { statuses: ['rejected'], title: 'Rejected', indicator: 'bg-muted text-foreground' },
-  { statuses: ['withdrawn'], title: 'Withdrawn', indicator: 'bg-muted text-foreground' },
+  { 
+    statuses: ['offer', 'offer_received', 'accepted'], 
+    title: 'Offer', 
+    indicator: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300',
+    headerColor: 'border-t-4 border-t-emerald-500'
+  },
+  { 
+    statuses: ['rejected'], 
+    title: 'Rejected', 
+    indicator: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300',
+    headerColor: 'border-t-4 border-t-red-500'
+  },
+  { 
+    statuses: ['withdrawn'], 
+    title: 'Withdrawn', 
+    indicator: 'bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-300',
+    headerColor: 'border-t-4 border-t-gray-500'
+  },
 ];
 
 const STATUS_LABELS: Record<ApplicationStatus, string> = {
@@ -109,8 +131,8 @@ export default function DashboardPage() {
       ) : (
         <div className="-mx-4 overflow-x-auto pb-4 sm:mx-0">
           <div className="flex min-w-[720px] gap-4 px-4 sm:min-w-0 sm:grid sm:grid-cols-2 sm:px-0 xl:grid-cols-5">
-            {columnCards.map(({ title, indicator, applications }) => (
-              <Card key={title} className="shadow-sm">
+            {columnCards.map(({ title, indicator, headerColor, applications }) => (
+              <Card key={title} className={`shadow-sm transition-all hover:shadow-md ${headerColor}`}>
                 <CardHeader className="flex flex-col space-y-1 pb-3">
                   <CardTitle className="flex items-center justify-between text-base font-semibold">
                     <span>{title}</span>
@@ -128,15 +150,15 @@ export default function DashboardPage() {
                     applications.map((application) => (
                       <article
                         key={application.id}
-                        className="space-y-3 rounded-xl border border-border bg-card p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-md"
+                        className="group cursor-pointer space-y-3 rounded-xl border border-border bg-card p-4 shadow-sm transition-all hover:-translate-y-1 hover:border-primary/40 hover:shadow-lg"
                       >
                         <div className="flex items-center justify-between gap-3">
                           <div className="flex items-center gap-2">
-                            <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-muted text-xs font-semibold text-muted-foreground">
+                            <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-purple-600 text-sm font-bold text-white shadow-sm">
                               {application.company?.charAt(0).toUpperCase() ?? '?'}
                             </div>
                             <div className="min-w-0">
-                              <p className="truncate text-sm font-semibold">
+                              <p className="truncate text-sm font-semibold group-hover:text-primary transition-colors">
                                 {application.position}
                               </p>
                               <p className="truncate text-xs text-muted-foreground">{application.company}</p>

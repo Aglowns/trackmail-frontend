@@ -135,7 +135,7 @@ const securityFeatures: Array<{
   },
   {
     title: 'Minimal Permissions',
-    description: 'Read-only Gmail scopes ensure TrackMail never sends emails on your behalf.',
+    description: 'Read-only Gmail scopes ensure JobMail never sends emails on your behalf.',
     icon: LockKeyhole,
   },
   {
@@ -188,7 +188,7 @@ export default function LandingPage() {
       <header className="sticky top-0 z-50 border-b border-slate-200/60 bg-white/80 backdrop-blur transition-colors dark:border-slate-800/80 dark:bg-slate-950/80">
         <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:h-20 sm:px-6 lg:px-8">
           <Link href="/" className="text-lg font-semibold tracking-tight sm:text-2xl">
-            TrackMail
+            JobMail
           </Link>
           <nav className="hidden items-center gap-8 text-sm font-medium text-slate-600 transition md:flex dark:text-slate-300">
             <Link href="#features" className="transition hover:text-slate-900 dark:hover:text-white">
@@ -278,7 +278,7 @@ export default function LandingPage() {
                 Track your job applications automatically
               </h1>
               <p className="text-base text-slate-600 transition dark:text-slate-300 sm:text-lg">
-                TrackMail ingests job-related emails, builds a kanban-ready dashboard, and nudges you with analytics & reminders so you never lose another opportunity.
+                JobMail ingests job-related emails, builds a kanban-ready dashboard, and nudges you with analytics & reminders so you never lose another opportunity.
               </p>
               <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
                 <Button asChild size="lg" className="shadow-sm">
@@ -403,7 +403,7 @@ export default function LandingPage() {
             {pricingPlans.map((plan) => {
               const price = plan.price[billingCycle];
               const isFree = price === 0;
-              return (
+    return (
                 <div
                   key={plan.name}
                   className={`flex h-full flex-col rounded-3xl border border-slate-200 bg-white/90 p-8 shadow-sm transition hover:-translate-y-1 hover:shadow-xl ${
@@ -445,8 +445,8 @@ export default function LandingPage() {
                       <Link href={plan.ctaHref}>{plan.ctaLabel}</Link>
                     </Button>
                   </div>
-                </div>
-              );
+      </div>
+    );
             })}
           </div>
         </section>
@@ -458,7 +458,7 @@ export default function LandingPage() {
                 Enterprise-grade security
               </h2>
               <p className="mt-3 text-base text-slate-600 transition dark:text-slate-300">
-                TrackMail respects user privacy with transparent security practices.
+                JobMail respects user privacy with transparent security practices.
               </p>
             </div>
             <div className="mt-12 grid gap-6 sm:grid-cols-2">
@@ -502,16 +502,16 @@ export default function LandingPage() {
         <div className="mx-auto grid max-w-6xl gap-8 px-4 py-16 text-sm text-slate-600 transition dark:text-slate-300 sm:grid-cols-2 md:grid-cols-4 sm:px-6 lg:px-8">
           <div className="space-y-3">
             <Link href="/" className="text-lg font-semibold text-slate-900 sm:text-xl">
-              TrackMail
+              JobMail
             </Link>
             <p className="text-sm text-slate-600">
               Automatically track your job applications from Gmail with intelligent parsing and analytics.
             </p>
             <div className="flex gap-4 text-slate-500">
-              <Link href="https://twitter.com" aria-label="TrackMail on Twitter">
+              <Link href="https://twitter.com" aria-label="JobMail on Twitter">
                 X
               </Link>
-              <Link href="https://github.com" aria-label="TrackMail on GitHub">
+              <Link href="https://github.com" aria-label="JobMail on GitHub">
                 GitHub
               </Link>
             </div>
@@ -537,7 +537,7 @@ export default function LandingPage() {
         </div>
         <div className="border-t border-slate-200/70 bg-white/60 py-6">
           <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-3 px-4 text-xs text-slate-500 sm:flex-row sm:px-6 lg:px-8">
-            <p>© {new Date().getFullYear()} TrackMail. All rights reserved.</p>
+            <p>© {new Date().getFullYear()} JobMail. All rights reserved.</p>
             <div className="flex gap-4">
               <Link href="#privacy" className="transition hover:text-slate-700">
                 Privacy

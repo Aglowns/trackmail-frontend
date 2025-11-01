@@ -71,7 +71,7 @@ export default function GmailTokenPage() {
             </svg>
           </div>
           <h1 className="text-2xl font-bold text-gray-900 mb-2">📧 Gmail Add-on Token</h1>
-          <p className="text-gray-600">Get your token to connect TrackMail with Gmail</p>
+          <p className="text-gray-600">Get your token to connect JobMail with Gmail</p>
         </div>
 
         <div className="space-y-6">
@@ -100,7 +100,7 @@ export default function GmailTokenPage() {
             <ol className="text-sm text-blue-800 space-y-1">
               <li>1. Copy the token above</li>
               <li>2. Open Gmail and any email</li>
-              <li>3. Look for TrackMail in the sidebar</li>
+              <li>3. Look for JobMail in the sidebar</li>
               <li>4. Paste the token in the &quot;Session Handle&quot; field</li>
               <li>5. Click &quot;Save Session&quot;</li>
             </ol>
@@ -108,7 +108,7 @@ export default function GmailTokenPage() {
 
           <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
             <p className="text-sm text-yellow-800">
-              <strong>Important:</strong> Make sure you&apos;re signed in with the same Gmail account that you&apos;re using the TrackMail add-on on. This token expires in 24 hours.
+              <strong>Important:</strong> Make sure you&apos;re signed in with the same Gmail account that you&apos;re using the JobMail add-on on. This token expires in 24 hours.
             </p>
           </div>
 

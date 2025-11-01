@@ -57,7 +57,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       <header className="border-b border-border bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/85">
         <div className="mx-auto flex h-16 max-w-7xl items-center gap-6 px-4 sm:h-20 sm:px-6 lg:px-8">
           <Link href="/dashboard" className="text-lg font-semibold tracking-tight sm:text-2xl">
-            TrackMail
+            JobMail
           </Link>
 
           <button

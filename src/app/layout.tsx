@@ -16,7 +16,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "TrackMail – Track your job applications automatically",
+  title: "JobMail – Track your job applications automatically",
   description:
     "Gmail add-on with smart parsing. Kanban dashboards, analytics, and reminders so you never miss an opportunity.",
   icons: {
@@ -33,10 +33,10 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen bg-background text-foreground transition-colors`}>
         <ThemeProvider>
-          <AuthProvider>
-            {children}
-            <Toaster position="top-right" />
-          </AuthProvider>
+        <AuthProvider>
+          {children}
+          <Toaster position="top-right" />
+        </AuthProvider>
         </ThemeProvider>
       </body>
     </html>

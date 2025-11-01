@@ -368,7 +368,7 @@ export default function SettingsPage() {
               <p className="mb-2 text-sm font-medium text-foreground">Setup Instructions:</p>
               <ol className="list-decimal space-y-2 pl-5 text-sm text-muted-foreground">
                 <li>Copy the token above by clicking the &quot;Copy&quot; button</li>
-                <li>Open Gmail and click the TrackMail add-on icon in the sidebar</li>
+                <li>Open Gmail and click the JobMail add-on icon in the sidebar</li>
                 <li>Click &quot;Get Started&quot; and then &quot;Paste Token&quot;</li>
                 <li>Paste the token and click &quot;Connect&quot;</li>
                 <li>That&apos;s it! You won&apos;t need to paste a token again.</li>

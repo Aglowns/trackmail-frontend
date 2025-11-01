@@ -1,6 +1,6 @@
-# TrackMail Frontend
+# JobMail Frontend
 
-A modern Next.js frontend for the TrackMail job application tracking system.
+A modern Next.js frontend for the JobMail job application tracking system.
 
 ## Features
 
@@ -30,7 +30,7 @@ A modern Next.js frontend for the TrackMail job application tracking system.
 - Node.js 18+ 
 - npm or yarn
 - Supabase account
-- TrackMail backend API running
+- JobMail backend API running
 
 ### Installation
 
@@ -126,7 +126,7 @@ The app can be deployed to any platform that supports Next.js:
 
 ## API Integration
 
-The frontend integrates with the TrackMail backend API. Make sure your backend is running and accessible at the URL specified in `NEXT_PUBLIC_API_URL`.
+The frontend integrates with the JobMail backend API. Make sure your backend is running and accessible at the URL specified in `NEXT_PUBLIC_API_URL`.
 
 ### Authentication Flow
 

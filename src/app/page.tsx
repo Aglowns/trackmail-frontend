@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import type { LucideIcon } from 'lucide-react';
+import Image from 'next/image';
 import {
   Mail,
   Sparkles,
@@ -187,8 +188,8 @@ export default function LandingPage() {
     <div className="min-h-screen bg-slate-50 text-slate-900 transition-colors dark:bg-slate-950 dark:text-slate-100">
       <header className="sticky top-0 z-50 border-b border-slate-200/60 bg-white/80 backdrop-blur transition-colors dark:border-slate-800/80 dark:bg-slate-950/80">
         <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:h-20 sm:px-6 lg:px-8">
-          <Link href="/" className="text-lg font-semibold tracking-tight sm:text-2xl">
-            JobMail
+          <Link href="/" className="flex items-center gap-2 text-lg font-semibold tracking-tight sm:text-2xl">
+            <Image src="/logo.svg" alt="Jobmail" width={120} height={40} className="h-8 w-auto" priority unoptimized />
           </Link>
           <nav className="hidden items-center gap-8 text-sm font-medium text-slate-600 transition md:flex dark:text-slate-300">
             <Link href="#features" className="transition hover:text-slate-900 dark:hover:text-white">

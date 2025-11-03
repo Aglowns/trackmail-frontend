@@ -20,7 +20,10 @@ export const metadata: Metadata = {
   description:
     "Gmail add-on with smart parsing. Kanban dashboards, analytics, and reminders so you never miss an opportunity.",
   icons: {
-    icon: "/favicon.ico",
+    icon: [
+      { url: "/favicon.svg", type: "image/svg+xml" },
+      { url: "/favicon.ico", type: "image/x-icon" },
+    ],
   },
 };
 

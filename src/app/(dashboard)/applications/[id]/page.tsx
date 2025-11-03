@@ -353,14 +353,14 @@ function InfoBlock({ title, value, icon, url }: { title: string; value: string; 
         {icon}
         {title}
       </p>
-      {url && value !== '—' ? (
+      {url ? (
         <a 
           href={url} 
           target="_blank" 
           rel="noopener noreferrer"
           className="mt-2 text-sm font-medium text-primary hover:underline block break-all"
         >
-          {value}
+          {value !== '—' ? value : 'Link'}
         </a>
       ) : (
         <p className="mt-2 text-sm font-medium">{value}</p>

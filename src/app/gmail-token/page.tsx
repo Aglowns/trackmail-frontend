@@ -1,26 +1,35 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { supabase } from '@/lib/supabase';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { Loader2, Mail, Copy, Check, RefreshCw, ArrowLeft } from 'lucide-react';
+
+import { supabase } from '@/lib/supabase';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+
+const cardStyles =
+  'group relative overflow-hidden border border-border/60 bg-card/80 shadow-2xl shadow-primary/20';
+const overlayStyles =
+  'pointer-events-none absolute inset-0 bg-gradient-to-br from-primary/15 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100';
 
 export default function GmailTokenPage() {
-  const [token, setToken] = useState<string>('');
+  const [token, setToken] = useState('');
   const [user, setUser] = useState<{ id: string; email?: string } | null>(null);
   const [loading, setLoading] = useState(true);
   const [copied, setCopied] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
-    // Get current user
     supabase.auth.getUser().then(({ data: { user } }) => {
       if (user) {
         setUser(user);
-        // Generate a simple token for Gmail Add-on
         const gmailToken = `gmail_${user.id}_${Date.now()}`;
         setToken(gmailToken);
       } else {
-        // Redirect to login with return URL
         router.push('/login?redirect=/gmail-token');
       }
       setLoading(false);
@@ -28,106 +37,127 @@ export default function GmailTokenPage() {
   }, [router]);
 
   const copyToClipboard = async () => {
+    if (!token) return;
     try {
       await navigator.clipboard.writeText(token);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
-    } catch (err) {
-      console.error('Failed to copy: ', err);
+    } catch (error) {
+      console.error('Failed to copy token', error);
     }
   };
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+      <div className="flex min-h-screen items-center justify-center bg-background">
+        <Loader2 className="h-10 w-10 animate-spin text-primary" />
       </div>
     );
   }
 
   if (!user) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Please sign in</h1>
-          <button 
-            onClick={() => router.push('/login')}
-            className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700"
-          >
-            Sign In
-          </button>
-        </div>
+      <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-background via-primary/10 to-background px-4">
+        <Card className={`${cardStyles} max-w-md w-full`}>
+          <div className={overlayStyles} />
+          <CardHeader className="relative space-y-2 text-center">
+            <CardTitle className="text-2xl">Sign in required</CardTitle>
+            <CardDescription>
+              You need to sign in before generating a Gmail token. We&apos;ll bring you back here after login.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="relative flex flex-col gap-3">
+            <Button onClick={() => router.push('/login')} className="w-full shadow-md shadow-primary/20">
+              Go to login
+            </Button>
+            <Button
+              variant="outline"
+              className="w-full border border-primary/30 text-primary hover:bg-primary/10"
+              onClick={() => router.push('/')}
+            >
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Back to dashboard
+            </Button>
+          </CardContent>
+        </Card>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl shadow-xl max-w-md w-full p-8">
-        <div className="text-center mb-8">
-          <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
-            <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-            </svg>
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-background via-primary/10 to-background px-4 py-12">
+      <Card className={`${cardStyles} w-full max-w-lg`}>
+        <div className={overlayStyles} />
+        <CardHeader className="relative space-y-3 text-center">
+          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-primary">
+            <Mail className="h-5 w-5" />
           </div>
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">📧 Gmail Add-on Token</h1>
-          <p className="text-gray-600">Get your token to connect JobMail with Gmail</p>
-        </div>
-
-        <div className="space-y-6">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Your Gmail Token:
-            </label>
-            <div className="relative">
-              <input
-                type="text"
+          <CardTitle className="text-2xl">Gmail Add-on Token</CardTitle>
+          <CardDescription>
+            Copy this secure token into the JobMail Gmail add-on to connect your inbox.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="relative space-y-6">
+          <div className="space-y-2">
+            <Label className="text-sm font-medium text-foreground">Your one-time token</Label>
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+              <Input
                 value={token}
                 readOnly
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 font-mono text-sm"
+                className="flex-1 bg-background/80 font-mono text-xs"
               />
-              <button
+              <Button
+                variant="outline"
+                className="flex items-center gap-2 border border-primary/30 text-primary hover:bg-primary/10"
                 onClick={copyToClipboard}
-                className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700"
               >
-                {copied ? '✓ Copied' : 'Copy'}
-              </button>
+                {copied ? (
+                  <>
+                    <Check className="h-4 w-4" /> Copied
+                  </>
+                ) : (
+                  <>
+                    <Copy className="h-4 w-4" /> Copy token
+                  </>
+                )}
+              </Button>
             </div>
           </div>
 
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-            <h3 className="font-semibold text-blue-900 mb-2">How to use:</h3>
-            <ol className="text-sm text-blue-800 space-y-1">
+          <div className="rounded-xl border border-border/60 bg-muted/40 p-5 text-sm">
+            <p className="mb-3 font-medium text-foreground">How to use it</p>
+            <ol className="space-y-2 text-muted-foreground">
               <li>1. Copy the token above</li>
-              <li>2. Open Gmail and any email</li>
-              <li>3. Look for JobMail in the sidebar</li>
-              <li>4. Paste the token in the &quot;Session Handle&quot; field</li>
-              <li>5. Click &quot;Save Session&quot;</li>
+              <li>2. Open Gmail and select any job-related email</li>
+              <li>3. Launch the JobMail add-on from the sidebar</li>
+              <li>4. Choose <strong>Paste Token</strong> and drop this value in</li>
+              <li>5. Hit connect — new applications will sync automatically</li>
             </ol>
           </div>
 
-          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-            <p className="text-sm text-yellow-800">
-              <strong>Important:</strong> Make sure you&apos;re signed in with the same Gmail account that you&apos;re using the JobMail add-on on. This token expires in 24 hours.
-            </p>
-          </div>
+          <Alert>
+            <AlertDescription className="text-sm">
+              Keep this token private. If you ever need to regenerate it, just refresh this page and we&apos;ll create a brand new secure token for you.
+            </AlertDescription>
+          </Alert>
 
-          <div className="flex space-x-3">
-            <button
-              onClick={() => router.push('/')}
-              className="flex-1 bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors"
+          <div className="flex flex-col gap-3 sm:flex-row">
+            <Button
+              variant="outline"
+              className="flex-1 border border-primary/30 text-primary hover:bg-primary/10"
+              onClick={() => router.push('/dashboard')}
             >
-              Back to Dashboard
-            </button>
-            <button
+              <ArrowLeft className="mr-2 h-4 w-4" /> Back to dashboard
+            </Button>
+            <Button
+              className="flex-1 shadow-md shadow-primary/20"
               onClick={() => window.location.reload()}
-              className="flex-1 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
             >
-              Generate New Token
-            </button>
+              <RefreshCw className="mr-2 h-4 w-4" /> Generate new token
+            </Button>
           </div>
-        </div>
-      </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }

@@ -4,7 +4,6 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import type { LucideIcon } from 'lucide-react';
-import Image from 'next/image';
 import {
   Mail,
   Sparkles,
@@ -188,8 +187,16 @@ export default function LandingPage() {
     <div className="min-h-screen bg-background text-foreground transition-colors">
       <header className="sticky top-0 z-50 border-b border-border bg-card/95 backdrop-blur transition-colors">
         <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:h-20 sm:px-6 lg:px-8">
-          <Link href="/" className="flex items-center gap-2 text-lg font-semibold tracking-tight sm:text-2xl">
-            <Image src="/logo.svg" alt="Jobmail" width={120} height={40} className="h-8 w-auto" priority />
+          <Link
+            href="/"
+            className="flex items-center gap-2 text-lg font-semibold tracking-tight text-primary sm:text-2xl"
+          >
+            <span className="flex h-9 w-9 items-center justify-center rounded-full bg-primary/10 text-base font-semibold text-primary">
+              JM
+            </span>
+            <span className="font-semibold text-foreground">
+              Job<span className="text-primary">Mail</span>
+            </span>
           </Link>
           <nav className="hidden items-center gap-8 text-sm font-medium text-muted-foreground transition md:flex">
             <Link href="#features" className="transition hover:text-foreground">
@@ -269,10 +276,11 @@ export default function LandingPage() {
       </header>
 
       <main>
-        <section className="bg-card/70 transition-colors">
-          <div className="mx-auto grid max-w-6xl gap-12 px-4 py-20 sm:py-28 sm:px-6 lg:grid-cols-2 lg:items-center lg:py-32 lg:px-8">
+        <section className="relative overflow-hidden">
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-background via-primary/10 to-accent/10 dark:from-background dark:via-primary/15 dark:to-background" />
+          <div className="relative mx-auto grid max-w-6xl gap-12 px-4 py-20 sm:py-28 sm:px-6 lg:grid-cols-2 lg:items-center lg:py-32 lg:px-8">
             <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4">
-              <span className="inline-flex items-center gap-2 rounded-full border border-border bg-muted px-3 py-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground transition-colors">
+              <span className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-primary">
                 <Sparkles className="h-3.5 w-3.5" /> Gmail add-on + smart parsing
               </span>
               <h1 className="text-3xl font-semibold tracking-tight text-foreground transition sm:text-4xl md:text-5xl">
@@ -282,13 +290,18 @@ export default function LandingPage() {
                 JobMail ingests job-related emails, builds a kanban-ready dashboard, and nudges you with analytics & reminders so you never lose another opportunity.
               </p>
               <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
-                <Button asChild size="lg" className="shadow-sm">
+                <Button asChild size="lg" className="shadow-xl shadow-primary/20">
                   <Link href="/signup" className="flex items-center gap-2">
                     Start Free
                     <ArrowRight className="h-4 w-4" />
                   </Link>
                 </Button>
-                <Button asChild size="lg" variant="outline" className="border-border bg-card">
+                <Button
+                  asChild
+                  size="lg"
+                  variant="outline"
+                  className="border-primary/30 bg-background/80 text-primary hover:bg-primary/10"
+                >
                   <Link href="#demo" className="flex items-center gap-2">
                     See Demo
                     <ArrowUpRight className="h-4 w-4" />
@@ -307,8 +320,9 @@ export default function LandingPage() {
               </ul>
             </div>
             <div className="relative animate-in fade-in slide-in-from-bottom-6">
-              <div className="rounded-3xl border border-border bg-gradient-to-br from-muted via-card to-muted p-2 shadow-xl shadow-foreground/5 transition">
-                <div className="flex aspect-[4/3] items-center justify-center rounded-2xl bg-foreground/5 text-sm font-medium text-muted-foreground transition">
+              <div className="relative overflow-hidden rounded-3xl border border-border/70 bg-card p-2 shadow-2xl shadow-primary/10">
+                <div className="pointer-events-none absolute inset-x-6 -top-16 h-40 rounded-full bg-primary/20 blur-3xl" />
+                <div className="relative flex aspect-[4/3] items-center justify-center rounded-2xl bg-muted/60 text-sm font-medium text-muted-foreground">
                   Gmail Sidebar + Dashboard Preview
                 </div>
               </div>
@@ -329,19 +343,21 @@ export default function LandingPage() {
             {features.map(({ title, description, icon: Icon }) => (
               <div
                 key={title}
-                className="rounded-2xl border border-border bg-card/80 p-8 shadow-sm transition hover:-translate-y-0.5 hover:shadow-lg"
+                className="group relative overflow-hidden rounded-2xl border border-border/70 bg-card p-8 shadow-lg shadow-primary/5 transition duration-300 hover:-translate-y-1 hover:shadow-primary/20"
               >
-                <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-foreground/5">
-                  <Icon className="h-6 w-6 text-muted-foreground" />
-                </span>
-                <h3 className="mt-6 text-lg font-semibold text-foreground">{title}</h3>
-                <p className="mt-3 text-sm text-muted-foreground">{description}</p>
+                <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+                <div className="relative flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                  <Icon className="h-6 w-6" />
+                </div>
+                <h3 className="relative mt-6 text-lg font-semibold text-foreground">{title}</h3>
+                <p className="relative mt-3 text-sm text-muted-foreground">{description}</p>
               </div>
             ))}
           </div>
         </section>
 
-        <section id="how-it-works" className="bg-card/60 transition-colors">
+        <section id="how-it-works" className="relative overflow-hidden">
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-tr from-accent/30 via-background/80 to-background dark:from-primary/20 dark:via-background dark:to-background" />
           <div className="mx-auto max-w-5xl px-4 py-20 sm:px-6 lg:px-8">
             <div className="text-center">
               <h2 className="text-2xl font-semibold tracking-tight text-foreground transition sm:text-3xl">
@@ -353,12 +369,16 @@ export default function LandingPage() {
             </div>
             <div className="mt-12 grid gap-8 md:grid-cols-3">
               {howItWorks.map((item) => (
-                <div key={item.step} className="flex flex-col gap-4 rounded-2xl border border-border bg-card/90 p-8 transition">
-                  <span className="flex h-10 w-10 items-center justify-center rounded-full bg-foreground/5 text-sm font-semibold text-muted-foreground transition">
+                <div
+                  key={item.step}
+                  className="relative flex flex-col gap-4 overflow-hidden rounded-2xl border border-border/70 bg-card p-8 shadow-lg shadow-primary/5 transition duration-300 hover:-translate-y-1 hover:shadow-primary/20"
+                >
+                  <div className="pointer-events-none absolute inset-x-0 -top-16 h-32 bg-gradient-to-b from-primary/20 via-transparent to-transparent opacity-0 transition-opacity duration-300 hover:opacity-100" />
+                  <span className="relative flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-sm font-semibold text-primary">
                     {item.step}
                   </span>
-                  <h3 className="text-lg font-semibold text-foreground transition">{item.title}</h3>
-                  <p className="text-sm text-muted-foreground transition">{item.description}</p>
+                  <h3 className="relative text-lg font-semibold text-foreground transition">{item.title}</h3>
+                  <p className="relative text-sm text-muted-foreground transition">{item.description}</p>
                 </div>
               ))}
             </div>
@@ -375,13 +395,13 @@ export default function LandingPage() {
                 Choose the plan that works best for you and upgrade anytime.
               </p>
             </div>
-            <div className="mx-auto flex items-center gap-3 rounded-full border border-border bg-card/80 px-2 py-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground transition">
+            <div className="mx-auto flex items-center gap-3 rounded-full border border-border/60 bg-card px-2 py-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground transition shadow-sm">
               <button
                 type="button"
                 onClick={() => setBillingCycle('monthly')}
                 className={`rounded-full px-4 py-2 transition ${
                   billingCycle === 'monthly'
-                    ? 'bg-primary text-primary-foreground shadow-sm'
+                    ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/40'
                     : 'text-muted-foreground hover:text-foreground'
                 }`}
               >
@@ -392,7 +412,7 @@ export default function LandingPage() {
                 onClick={() => setBillingCycle('annual')}
                 className={`rounded-full px-4 py-2 transition ${
                   billingCycle === 'annual'
-                    ? 'bg-primary text-primary-foreground shadow-sm'
+                    ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/40'
                     : 'text-muted-foreground hover:text-foreground'
                 }`}
               >
@@ -407,22 +427,21 @@ export default function LandingPage() {
     return (
                 <div
                   key={plan.name}
-                  className={`flex h-full flex-col rounded-3xl border border-border bg-card/90 p-8 shadow-sm transition hover:-translate-y-1 hover:shadow-xl ${
-                    plan.highlight 
-                      ? 'ring-2 ring-primary/20' 
-                      : ''
+                  className={`group relative flex h-full flex-col overflow-hidden rounded-3xl border border-border/70 bg-card p-8 shadow-xl shadow-primary/5 transition duration-300 hover:-translate-y-1 hover:shadow-primary/20 ${
+                    plan.highlight ? 'ring-2 ring-primary/40' : ''
                   }`}
                 >
-                  <div className="flex items-center justify-between">
+                  <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-primary/15 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+                  <div className="relative flex items-center justify-between">
                     <h3 className="text-xl font-semibold text-foreground transition">{plan.name}</h3>
                     {plan.badge && (
-                      <span className="rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary transition">
+                      <span className="rounded-full bg-primary px-3 py-1 text-xs font-semibold text-primary-foreground shadow-sm shadow-primary/30">
                         {plan.badge}
                       </span>
                     )}
                   </div>
-                  <p className="mt-3 text-sm text-muted-foreground transition">{plan.description}</p>
-                  <div className="mt-6 flex items-baseline gap-2">
+                  <p className="relative mt-3 text-sm text-muted-foreground transition">{plan.description}</p>
+                  <div className="relative mt-6 flex items-baseline gap-2">
                     <span className="text-3xl font-semibold text-foreground transition">
                       {isFree ? '$0' : `$${price}`}
                     </span>
@@ -430,7 +449,7 @@ export default function LandingPage() {
                       {billingCycle === 'monthly' ? '/month' : '/month (billed annually)'}
                     </span>
                   </div>
-                  <ul className="mt-6 space-y-3 text-sm text-muted-foreground transition">
+                  <ul className="relative mt-6 space-y-3 text-sm text-muted-foreground transition">
                     {plan.perks.map((perk) => (
                       <li key={perk} className="flex items-start gap-2">
                         <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-primary" />
@@ -438,12 +457,12 @@ export default function LandingPage() {
                       </li>
                     ))}
                   </ul>
-                  <div className="mt-8">
+                  <div className="relative mt-8">
                     <Button
                       asChild
                       size="lg"
                       variant={plan.highlight ? 'default' : 'outline'}
-                      className="w-full"
+                      className={`w-full ${plan.highlight ? 'bg-primary shadow-lg shadow-primary/30 hover:bg-primary/90' : ''}`}
                     >
                       <Link href={plan.ctaHref}>{plan.ctaLabel}</Link>
                     </Button>

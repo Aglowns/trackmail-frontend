@@ -40,6 +40,11 @@ const EVENT_TYPES = [
   { value: 'other', label: 'Other' },
 ];
 
+const detailCardStyles =
+  'group relative overflow-hidden border border-border/60 bg-card/80 shadow-lg shadow-primary/5 transition duration-300 hover:-translate-y-1 hover:shadow-primary/20';
+const detailOverlayStyles =
+  'pointer-events-none absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100';
+
 export default function ApplicationDetailPage() {
   const params = useParams<{ id: string }>();
   const [application, setApplication] = useState<Application | null>(null);
@@ -103,7 +108,7 @@ export default function ApplicationDetailPage() {
 
   if (loading) {
     return (
-      <div className="flex min-h-[200px] items-center justify-center text-muted-foreground">
+      <div className="flex min-h-[200px] items-center justify-center rounded-xl border border-dashed border-border/60 bg-card/80 text-muted-foreground">
         Loading application...
       </div>
     );
@@ -111,7 +116,7 @@ export default function ApplicationDetailPage() {
 
   if (!application) {
     return (
-      <div className="rounded-xl border border-border p-6 text-center text-muted-foreground">
+      <div className="rounded-xl border border-border/60 bg-card/80 p-6 text-center text-muted-foreground">
         Application not found.
       </div>
     );
@@ -131,7 +136,11 @@ export default function ApplicationDetailPage() {
             <p className="text-sm text-muted-foreground">{application.company}</p>
           </div>
         </div>
-        <Button variant="outline" className="flex items-center gap-2" asChild>
+        <Button
+          variant="outline"
+          className="flex items-center gap-2 border border-primary/30 text-primary shadow-md shadow-primary/20 hover:bg-primary/10"
+          asChild
+        >
           <Link href={`/applications/${application.id}/edit`}>
             <NotebookPen className="h-4 w-4" /> Edit Application
           </Link>
@@ -139,11 +148,12 @@ export default function ApplicationDetailPage() {
       </div>
 
       <div className="grid gap-6 lg:grid-cols-[320px_1fr]">
-        <Card className="border-none shadow-sm">
-          <CardContent className="space-y-6 p-4 sm:p-6">
+        <Card className={detailCardStyles}>
+          <div className={detailOverlayStyles} />
+          <CardContent className="relative space-y-6 p-4 sm:p-6">
             <section className="space-y-3">
               <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-muted text-base font-semibold text-muted-foreground">
+                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-base font-semibold text-primary">
                   {application.company?.charAt(0).toUpperCase()}
                 </div>
                 <div>
@@ -151,10 +161,10 @@ export default function ApplicationDetailPage() {
                   <p className="text-xs text-muted-foreground">{application.location ?? 'Location unknown'}</p>
                 </div>
               </div>
-              <div className="rounded-xl border border-border bg-muted/50 p-4 text-sm">
+              <div className="rounded-xl border border-border/60 bg-muted/40 p-4 text-sm">
                 <p className="flex items-center justify-between text-xs uppercase tracking-wide text-muted-foreground">
                   Status
-                  <span className="rounded-full bg-muted px-2 py-1 text-[11px] font-semibold">
+                  <span className="rounded-full bg-primary/10 px-2 py-1 text-[11px] font-semibold text-primary">
                     {application.status.replace('_', ' ')}
                   </span>
                 </p>
@@ -169,18 +179,18 @@ export default function ApplicationDetailPage() {
               <h3 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
                 Confidence & Source
               </h3>
-              <div className="space-y-2 rounded-xl border border-border bg-muted/50 p-4 text-sm">
+              <div className="space-y-2 rounded-xl border border-border/60 bg-muted/40 p-4 text-sm">
                 <p className="flex items-center justify-between">
                   Confidence
-                  <span className="font-medium">{application.confidence ?? 'Not set'}</span>
+                  <span className="font-medium text-foreground">{application.confidence ?? 'Not set'}</span>
                 </p>
                 <p className="flex items-center justify-between">
                   Source
-                  <span className="font-medium">{application.source ?? '—'}</span>
+                  <span className="font-medium text-foreground">{application.source ?? '—'}</span>
                 </p>
                 <p className="flex items-center justify-between">
                   Salary Range
-                  <span className="font-medium">{application.salary_range ?? '—'}</span>
+                  <span className="font-medium text-foreground">{application.salary_range ?? '—'}</span>
                 </p>
               </div>
             </section>
@@ -198,7 +208,10 @@ export default function ApplicationDetailPage() {
 
             <Dialog open={eventDialogOpen} onOpenChange={setEventDialogOpen}>
               <DialogTrigger asChild>
-                <Button variant="outline" className="w-full items-center gap-2">
+                <Button
+                  variant="outline"
+                  className="w-full items-center gap-2 border border-primary/30 text-primary shadow-md shadow-primary/20 hover:bg-primary/10"
+                >
                   <Plus className="h-4 w-4" /> Add Timeline Event
                 </Button>
               </DialogTrigger>
@@ -264,9 +277,10 @@ export default function ApplicationDetailPage() {
           </CardContent>
         </Card>
 
-        <Card className="border-none shadow-sm">
-          <CardContent className="p-0">
-            <div className="border-b border-border px-4 sm:px-6 overflow-x-auto">
+        <Card className={detailCardStyles}>
+          <div className={detailOverlayStyles} />
+          <CardContent className="relative p-0">
+            <div className="overflow-x-auto border-b border-border/60 px-4 sm:px-6">
               <div className="flex min-w-[320px] gap-4">
                 {tabs.map((tab) => (
                   <button
@@ -275,7 +289,7 @@ export default function ApplicationDetailPage() {
                     onClick={() => setActiveTab(tab.key)}
                     className={`border-b-2 px-2 py-4 text-sm font-medium transition ${
                       activeTab === tab.key
-                        ? 'border-foreground text-foreground'
+                        ? 'border-primary text-primary'
                         : 'border-transparent text-muted-foreground hover:text-foreground'
                     }`}
                   >
@@ -301,7 +315,7 @@ export default function ApplicationDetailPage() {
 function Timeline({ events }: { events: TimelineEvent[] }) {
   if (events.length === 0) {
     return (
-      <div className="rounded-xl border border-border bg-muted/50 p-6 text-sm text-muted-foreground">
+      <div className="rounded-xl border border-border/60 bg-muted/40 p-6 text-sm text-muted-foreground">
         No timeline events yet. Add events to track progress.
       </div>
     );
@@ -311,10 +325,10 @@ function Timeline({ events }: { events: TimelineEvent[] }) {
     <ol className="space-y-6">
       {events.map((event) => (
         <li key={event.id} className="relative flex gap-4">
-          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-muted text-muted-foreground">
+          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-primary">
             <Clock className="h-4 w-4" />
           </div>
-          <div className="flex-1 space-y-1 rounded-xl border border-border bg-card p-4 text-sm">
+          <div className="flex-1 space-y-1 rounded-xl border border-border/60 bg-card/80 p-4 text-sm shadow-sm">
             <div className="flex items-center justify-between text-xs uppercase tracking-wide text-muted-foreground">
               <span>{event.event_type.replace('_', ' ')}</span>
               <span>{new Date(event.created_at).toLocaleString()}</span>
@@ -348,22 +362,22 @@ function Details({ application }: { application: Application }) {
 
 function InfoBlock({ title, value, icon, url }: { title: string; value: string; icon: React.ReactNode; url?: string }) {
   return (
-    <div className="rounded-xl border border-border bg-muted/50 p-4 text-sm">
+    <div className="rounded-xl border border-border/60 bg-card/80 p-4 text-sm shadow-sm">
       <p className="flex items-center gap-2 text-xs uppercase tracking-wide text-muted-foreground">
         {icon}
         {title}
       </p>
       {url ? (
-        <a 
-          href={url} 
-          target="_blank" 
+        <a
+          href={url}
+          target="_blank"
           rel="noopener noreferrer"
-          className="mt-2 text-sm font-medium text-primary hover:underline block break-all"
+          className="mt-2 block break-all text-sm font-medium text-primary hover:text-primary/80"
         >
           {value !== '—' ? value : 'Link'}
         </a>
       ) : (
-        <p className="mt-2 text-sm font-medium">{value}</p>
+        <p className="mt-2 text-sm font-medium text-foreground">{value}</p>
       )}
     </div>
   );
@@ -373,7 +387,7 @@ function Notes({ notes }: { notes?: string }) {
   if (!notes) {
     return <EmptyState icon={<NotebookPen className="h-5 w-5" />} message="No notes yet" />;
   }
-  return <p className="rounded-xl border border-border bg-muted/50 p-4 text-sm">{notes}</p>;
+  return <p className="rounded-xl border border-border/60 bg-card/80 p-4 text-sm shadow-sm">{notes}</p>;
 }
 
 function Emails() {
@@ -382,8 +396,8 @@ function Emails() {
 
 function EmptyState({ icon, message }: { icon: React.ReactNode; message: string }) {
   return (
-    <div className="flex flex-col items-center gap-3 rounded-xl border border-dashed border-border bg-muted/50 p-10 text-sm text-muted-foreground">
-      <span className="rounded-full bg-card p-3 text-muted-foreground">{icon}</span>
+    <div className="flex flex-col items-center gap-3 rounded-xl border border-dashed border-border/60 bg-muted/40 p-10 text-sm text-muted-foreground">
+      <span className="rounded-full bg-card/80 p-3 text-muted-foreground">{icon}</span>
       {message}
     </div>
   );

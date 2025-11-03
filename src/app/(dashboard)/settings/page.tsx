@@ -55,6 +55,11 @@ function mapFormToPayload(values: ProfileFormValues): UpdateUserProfileRequest {
   return payload;
 }
 
+const cardStyles =
+  'group relative overflow-hidden border border-border/60 bg-card/80 shadow-lg shadow-primary/5 transition duration-300 hover:-translate-y-1 hover:shadow-primary/20';
+const cardOverlayStyles =
+  'pointer-events-none absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100';
+
 export default function SettingsPage() {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(false);
@@ -190,20 +195,22 @@ export default function SettingsPage() {
     <div className="space-y-6">
       <div>
         <h1 className="text-3xl font-bold">Settings</h1>
-        <p className="text-gray-600">
+        <p className="text-muted-foreground">
           Manage your profile information, preferences, and notifications
         </p>
       </div>
 
       {loading ? (
-        <Card>
+        <Card className={cardStyles}>
+          <div className={cardOverlayStyles} />
           <CardContent className="flex items-center justify-center py-12">
-            <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
+            <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
           </CardContent>
         </Card>
       ) : (
-        <Card>
-          <CardHeader className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+        <Card className={cardStyles}>
+          <div className={cardOverlayStyles} />
+          <CardHeader className="relative flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
             <div>
               <CardTitle>Profile Information</CardTitle>
               <CardDescription>
@@ -216,7 +223,7 @@ export default function SettingsPage() {
               </Button>
             )}
           </CardHeader>
-          <CardContent>
+          <CardContent className="relative">
             {isEditing ? (
               <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
@@ -275,13 +282,13 @@ export default function SettingsPage() {
             ) : (
               <div className="space-y-8">
                 <div className="grid gap-6 sm:grid-cols-2">
-                  <div className="rounded-xl border bg-card p-5 shadow-sm">
+                  <div className="rounded-xl border border-border/70 bg-card/80 p-5 shadow-md shadow-primary/10">
                     <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
                       Full name
                     </p>
                     <p className="mt-2 text-lg font-medium text-foreground">{displayName}</p>
                   </div>
-                  <div className="rounded-xl border bg-card p-5 shadow-sm">
+                  <div className="rounded-xl border border-border/70 bg-card/80 p-5 shadow-md shadow-primary/10">
                     <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
                       Phone number
                     </p>
@@ -289,14 +296,14 @@ export default function SettingsPage() {
                   </div>
                 </div>
 
-                <div className="flex flex-col justify-between gap-4 rounded-xl bg-muted/60 p-5 sm:flex-row sm:items-center">
+                <div className="flex flex-col justify-between gap-4 rounded-xl border border-primary/20 bg-primary/5 p-5 sm:flex-row sm:items-center">
                   <div>
                     <p className="text-sm font-medium text-foreground">Need to make a change?</p>
                     <p className="text-sm text-muted-foreground">
                       You can update your details at any time. Changes take effect immediately after saving.
                     </p>
                   </div>
-                  <Button onClick={handleEdit} variant="default">
+                  <Button onClick={handleEdit} variant="default" className="shadow-md shadow-primary/20">
                     Edit profile
                   </Button>
                 </div>
@@ -314,14 +321,15 @@ export default function SettingsPage() {
 
       {/* Gmail Add-on Integration Section */}
       {!loading && (
-        <Card>
-          <CardHeader>
+        <Card className={cardStyles}>
+          <div className={cardOverlayStyles} />
+          <CardHeader className="relative">
             <CardTitle>Gmail Add-on Integration</CardTitle>
             <CardDescription>
               Connect your Gmail account to automatically track job application emails
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-6">
+          <CardContent className="relative space-y-6">
             <div>
               <div className="mb-2">
                 <p className="text-sm font-medium text-foreground">Your API Key</p>
@@ -332,28 +340,33 @@ export default function SettingsPage() {
               
               {apiKey ? (
                 <div className="space-y-3">
-                  <div className="flex gap-2">
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
                     <div className="relative flex-1">
                       <Input
                         readOnly
                         value={apiKey}
-                        className="font-mono text-xs pr-10"
-                        type={showToken ? "text" : "password"}
+                        className="h-11 bg-background/80 pr-12 font-mono text-xs"
+                        type={showToken ? 'text' : 'password'}
                       />
                       <button
                         type="button"
                         onClick={() => setShowToken(!showToken)}
-                        className="absolute right-2 top-1/2 -translate-y-1/2 p-1 hover:bg-gray-100 rounded"
-                        aria-label={showToken ? "Hide API key" : "Show API key"}
+                        className="absolute right-2 top-1/2 -translate-y-1/2 rounded-md p-2 text-muted-foreground transition hover:bg-muted/60"
+                        aria-label={showToken ? 'Hide API key' : 'Show API key'}
                       >
                         {showToken ? (
-                          <EyeOff className="h-4 w-4 text-gray-500" />
+                          <EyeOff className="h-4 w-4" />
                         ) : (
-                          <Eye className="h-4 w-4 text-gray-500" />
+                          <Eye className="h-4 w-4" />
                         )}
                       </button>
                     </div>
-                    <Button onClick={handleCopyToken} variant="outline" size="default">
+                    <Button
+                      onClick={handleCopyToken}
+                      variant="outline"
+                      size="default"
+                      className="w-full border border-primary/30 text-primary hover:bg-primary/10 sm:w-auto"
+                    >
                       {tokenCopied ? (
                         <>
                           <Check className="mr-2 h-4 w-4" />
@@ -376,9 +389,9 @@ export default function SettingsPage() {
                   </Alert>
                 </div>
               ) : (
-                <div className="flex flex-col items-center justify-center gap-4 rounded-lg border border-dashed p-8">
+                <div className="flex flex-col items-center justify-center gap-4 rounded-lg border border-dashed border-border/60 bg-background/60 p-8 text-center">
                   <div className="text-center">
-                    <p className="text-sm text-muted-foreground mb-4">
+                    <p className="mb-4 text-sm text-muted-foreground">
                       {apiKeys.length > 0 
                         ? "You already have API keys. Generate a new one to display it here (you can only see it once!)."
                         : "Generate an API key to connect your Gmail add-on."
@@ -388,6 +401,7 @@ export default function SettingsPage() {
                       onClick={handleGenerateApiKey} 
                       disabled={generatingKey}
                       variant="default"
+                      className="shadow-md shadow-primary/20"
                     >
                       {generatingKey ? (
                         <>
@@ -403,7 +417,7 @@ export default function SettingsPage() {
               )}
             </div>
 
-            <div className="rounded-xl bg-muted/60 p-5">
+            <div className="rounded-xl border border-border/60 bg-muted/40 p-5">
               <p className="mb-2 text-sm font-medium text-foreground">Setup Instructions:</p>
               <ol className="list-decimal space-y-2 pl-5 text-sm text-muted-foreground">
                 <li>Click &quot;Generate API Key&quot; above to create your key</li>
@@ -415,15 +429,15 @@ export default function SettingsPage() {
               </ol>
             </div>
 
-            <div className="flex items-start gap-3 rounded-xl border-l-4 border-blue-500 bg-blue-50 p-4 dark:bg-blue-950/30">
-              <div className="text-blue-600 dark:text-blue-400">
+            <div className="flex items-start gap-3 rounded-xl border border-primary/20 bg-primary/5 p-4">
+              <div className="text-primary">
                 ℹ️
               </div>
               <div>
-                <p className="text-sm font-medium text-blue-900 dark:text-blue-100">
+                <p className="text-sm font-medium text-foreground">
                   One-time Setup
                 </p>
-                <p className="mt-1 text-sm text-blue-700 dark:text-blue-300">
+                <p className="mt-1 text-sm text-muted-foreground">
                   API keys are simple, long-lived tokens that don&apos;t expire. They&apos;re much more reliable than JWT tokens for Gmail add-on integration.
                 </p>
               </div>

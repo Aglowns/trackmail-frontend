@@ -101,10 +101,14 @@ function ApplicationsContent() {
           <p className="text-sm text-muted-foreground">Manage and track all your job applications</p>
         </div>
         <div className="flex w-full items-center gap-3 sm:w-auto">
-          <Button variant="outline" className="flex items-center gap-2" onClick={handleExport}>
+          <Button
+            variant="outline"
+            className="flex items-center gap-2 rounded-full border border-primary/30 bg-background/80 text-primary shadow-sm hover:bg-primary/10"
+            onClick={handleExport}
+          >
             <Download className="h-4 w-4" /> Export
           </Button>
-          <Button asChild>
+          <Button asChild className="shadow-lg shadow-primary/30">
             <Link href="/applications/new" className="flex items-center gap-2">
               <Plus className="h-4 w-4" /> Add Application
             </Link>
@@ -112,8 +116,9 @@ function ApplicationsContent() {
         </div>
       </div>
 
-      <Card className="border-none shadow-sm">
-        <CardContent className="space-y-6 p-4 sm:p-6">
+      <Card className="group relative overflow-hidden border border-border/60 bg-card/80 shadow-lg shadow-primary/5">
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+        <CardContent className="relative space-y-6 p-4 sm:p-6">
           <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
             <Select
               value={filters.status ?? 'all'}
@@ -172,7 +177,7 @@ function ApplicationsContent() {
               </SelectContent>
             </Select>
 
-            <div className="flex items-center gap-2 rounded-xl border border-input bg-muted px-3">
+            <div className="flex items-center gap-2 rounded-xl border border-input bg-background/80 px-3 shadow-sm">
               <Filter className="h-4 w-4 text-muted-foreground" />
               <Input
                 placeholder="Search applications..."
@@ -185,9 +190,9 @@ function ApplicationsContent() {
             </div>
           </div>
 
-          <div className="-mx-4 overflow-x-auto rounded-2xl border border-border sm:mx-0">
+          <div className="-mx-4 overflow-x-auto rounded-2xl border border-border/70 bg-card/60 sm:mx-0">
             <Table className="min-w-[720px] sm:min-w-full">
-              <TableHeader className="bg-muted/50">
+              <TableHeader className="bg-muted/30">
                 <TableRow>
                   <TableHead className="w-12">
                     <input type="checkbox" className="h-4 w-4 rounded border-border" />
@@ -225,7 +230,7 @@ function ApplicationsContent() {
                       </TableCell>
                       <TableCell className="font-medium">
                         <div className="flex items-center gap-3">
-                          <span className="flex h-9 w-9 items-center justify-center rounded-full bg-muted text-xs font-semibold text-muted-foreground">
+                          <span className="flex h-9 w-9 items-center justify-center rounded-full bg-primary/10 text-xs font-semibold text-primary">
                             {application.company?.charAt(0).toUpperCase() ?? '?'}
                           </span>
                           {application.company}
@@ -234,7 +239,7 @@ function ApplicationsContent() {
                       <TableCell>{application.position}</TableCell>
                       <TableCell>{application.location ?? '—'}</TableCell>
                       <TableCell>
-                        <span className="rounded-full bg-muted px-2 py-1 text-xs font-semibold text-muted-foreground">
+                        <span className="rounded-full bg-primary/10 px-2 py-1 text-xs font-semibold text-primary">
                           {application.status.replace('_', ' ')}
                         </span>
                       </TableCell>
@@ -248,16 +253,16 @@ function ApplicationsContent() {
                       </TableCell>
                       <TableCell>
                         {application.source_url ? (
-                          <a 
-                            href={application.source_url} 
-                            target="_blank" 
+                          <a
+                            href={application.source_url}
+                            target="_blank"
                             rel="noopener noreferrer"
-                            className="text-sm text-primary hover:underline"
+                            className="inline-flex items-center gap-1 text-sm font-medium text-primary hover:text-primary/80"
                           >
-                            {application.source || 'Link'}
+                            {application.source || 'View'}
                           </a>
                         ) : (
-                          application.source ?? '—'
+                          <span className="text-muted-foreground">{application.source ?? '—'}</span>
                         )}
                       </TableCell>
                       <TableCell className="text-right">

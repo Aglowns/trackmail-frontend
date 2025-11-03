@@ -15,15 +15,15 @@ const COLUMN_CONFIG: Array<{
   title: string;
   indicator: string;
 }> = [
-  { statuses: ['applied'], title: 'Applied', indicator: 'bg-muted text-foreground' },
+  { statuses: ['applied'], title: 'Applied', indicator: 'bg-primary/10 text-primary' },
   {
     statuses: ['interviewing', 'interview_scheduled', 'interview_completed', 'screening'],
     title: 'Interviewed',
-    indicator: 'bg-muted text-foreground',
+    indicator: 'bg-primary/10 text-primary',
   },
-  { statuses: ['offer', 'offer_received', 'accepted'], title: 'Offer', indicator: 'bg-muted text-foreground' },
-  { statuses: ['rejected'], title: 'Rejected', indicator: 'bg-muted text-foreground' },
-  { statuses: ['withdrawn'], title: 'Withdrawn', indicator: 'bg-muted text-foreground' },
+  { statuses: ['offer', 'offer_received', 'accepted'], title: 'Offer', indicator: 'bg-primary/10 text-primary' },
+  { statuses: ['rejected'], title: 'Rejected', indicator: 'bg-primary/10 text-primary' },
+  { statuses: ['withdrawn'], title: 'Withdrawn', indicator: 'bg-primary/10 text-primary' },
 ];
 
 const STATUS_LABELS: Record<ApplicationStatus, string> = {
@@ -92,7 +92,7 @@ export default function DashboardPage() {
           <h1 className="text-2xl font-semibold tracking-tight">Application Dashboard</h1>
           <p className="text-sm text-muted-foreground">Track and manage your job applications</p>
         </div>
-        <Button asChild size="lg" className="w-full sm:w-auto">
+        <Button asChild size="lg" className="w-full shadow-lg shadow-primary/30 sm:w-auto">
           <Link href="/applications/new" className="flex items-center gap-2">
             <Plus className="h-4 w-4" />
             Add Application
@@ -110,8 +110,12 @@ export default function DashboardPage() {
         <div className="-mx-4 overflow-x-auto pb-4 sm:mx-0">
           <div className="flex min-w-[720px] gap-4 px-4 sm:min-w-0 sm:grid sm:grid-cols-2 sm:px-0 xl:grid-cols-5">
             {columnCards.map(({ title, indicator, applications }) => (
-              <Card key={title} className="shadow-sm">
-                <CardHeader className="flex flex-col space-y-1 pb-3">
+              <Card
+                key={title}
+                className="group relative overflow-hidden border border-border/60 bg-card/80 shadow-lg shadow-primary/5 transition duration-300 hover:-translate-y-1 hover:shadow-primary/20"
+              >
+                <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+                <CardHeader className="relative flex flex-col space-y-1 pb-3">
                   <CardTitle className="flex items-center justify-between text-base font-semibold">
                     <span>{title}</span>
                     <span className={`flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold ${indicator}`}>
@@ -119,9 +123,9 @@ export default function DashboardPage() {
                     </span>
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-4">
+                <CardContent className="relative space-y-4">
                   {applications.length === 0 ? (
-                    <div className="rounded-xl border border-dashed border-border bg-muted/50 py-8 text-center text-sm text-muted-foreground">
+                    <div className="rounded-xl border border-dashed border-border bg-muted/40 py-8 text-center text-sm text-muted-foreground">
                       No applications yet
                     </div>
                   ) : (
@@ -147,13 +151,13 @@ export default function DashboardPage() {
 
                         <div className="flex flex-wrap gap-2 text-xs text-muted-foreground">
                           {application.location && (
-                            <span className="rounded-full bg-muted px-2 py-1">{application.location}</span>
+                            <span className="rounded-full bg-muted/60 px-2 py-1">{application.location}</span>
                           )}
-                          <span className="rounded-full bg-muted px-2 py-1">
+                          <span className="rounded-full bg-primary/10 px-2 py-1 text-primary">
                             {statusLabel(application.status)}
                           </span>
                           {application.applied_at && (
-                            <span className="rounded-full bg-muted px-2 py-1">
+                            <span className="rounded-full bg-muted/60 px-2 py-1">
                               {new Date(application.applied_at).toLocaleDateString()}
                             </span>
                           )}

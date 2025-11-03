@@ -38,6 +38,9 @@ function formatNumber(value: number): string {
   return value.toString();
 }
 
+const cardBaseStyles =
+  'group relative overflow-hidden border border-border/60 bg-card/80 shadow-lg shadow-primary/5 transition duration-300 hover:-translate-y-1 hover:shadow-primary/20';
+
 export default function AnalyticsPage() {
   const [loading, setLoading] = useState(true);
   const [overview, setOverview] = useState<AnalyticsOverview | null>(null);
@@ -69,7 +72,7 @@ export default function AnalyticsPage() {
 
   if (loading) {
     return (
-      <div className="flex min-h-[300px] items-center justify-center rounded-2xl border border-dashed border-border">
+      <div className="flex min-h-[300px] items-center justify-center rounded-2xl border border-dashed border-border/70 bg-card/80">
         <div className="flex items-center gap-2 text-muted-foreground">
           <Loader2 className="h-5 w-5 animate-spin" />
           Loading analytics...
@@ -90,44 +93,48 @@ export default function AnalyticsPage() {
       {overview && (
         <div className="-mx-4 overflow-x-auto pb-2 sm:mx-0">
           <div className="flex min-w-[720px] gap-4 px-4 md:grid md:min-w-0 md:grid-cols-2 xl:grid-cols-4 md:px-0">
-            <Card className="border-none shadow-sm">
-              <CardHeader className="pb-2">
+            <Card className={cardBaseStyles}>
+              <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+              <CardHeader className="relative pb-2">
                 <CardTitle className="text-sm font-medium text-muted-foreground">Total Applications</CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className="relative">
                 <p className="text-3xl font-semibold">
                   {formatNumber(overview.total_applications)}
                 </p>
               </CardContent>
             </Card>
 
-            <Card className="border-none shadow-sm">
-              <CardHeader className="pb-2">
+            <Card className={cardBaseStyles}>
+              <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+              <CardHeader className="relative pb-2">
                 <CardTitle className="text-sm font-medium text-muted-foreground">Applied last 30 days</CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className="relative">
                 <p className="text-3xl font-semibold">
                   {formatNumber(overview.applications_this_month)}
                 </p>
               </CardContent>
             </Card>
 
-            <Card className="border-none shadow-sm">
-              <CardHeader className="pb-2">
+            <Card className={cardBaseStyles}>
+              <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+              <CardHeader className="relative pb-2">
                 <CardTitle className="text-sm font-medium text-muted-foreground">Response rate</CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className="relative">
                 <p className="text-3xl font-semibold">
                   {overview.response_rate}%
                 </p>
               </CardContent>
             </Card>
 
-            <Card className="border-none shadow-sm">
-              <CardHeader className="pb-2">
+            <Card className={cardBaseStyles}>
+              <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+              <CardHeader className="relative pb-2">
                 <CardTitle className="text-sm font-medium text-muted-foreground">Active pipelines</CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className="relative">
                 <p className="text-3xl font-semibold">
                   {
                     Object.keys(overview.status_counts).filter(
@@ -142,13 +149,14 @@ export default function AnalyticsPage() {
       )}
 
       <div className="grid gap-6 lg:grid-cols-3">
-        <Card className="border-none shadow-sm lg:col-span-2">
-          <CardHeader>
+        <Card className={`${cardBaseStyles} lg:col-span-2`}>
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+          <CardHeader className="relative">
             <CardTitle className="text-base font-semibold">
               Applications trend
             </CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="relative">
             {trends ? (
               <div className="space-y-3">
                 <div className="flex items-center justify-between text-sm text-muted-foreground">
@@ -159,7 +167,7 @@ export default function AnalyticsPage() {
                   {trends.trend_data.map((point) => (
                     <div key={point.date} className="flex h-24 flex-col justify-end">
                       <div
-                        className="rounded-t-md bg-indigo-200 dark:bg-indigo-500"
+                        className="rounded-t-md bg-primary/60"
                         style={{ height: `${Math.min(100, point.applications * 20)}%` }}
                       />
                       <span className="truncate pt-2 text-[11px] text-muted-foreground">
@@ -175,18 +183,19 @@ export default function AnalyticsPage() {
           </CardContent>
         </Card>
 
-        <Card className="border-none shadow-sm">
-          <CardHeader>
+        <Card className={cardBaseStyles}>
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+          <CardHeader className="relative">
             <CardTitle className="text-base font-semibold">
               Pipeline status
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-3">
+          <CardContent className="relative space-y-3">
             {overview ? (
               Object.entries(overview.status_counts).map(([status, count]) => (
                 <div key={status} className="flex items-center justify-between text-sm">
                   <span className="text-muted-foreground">{formatStatus(status)}</span>
-                  <span className="font-semibold">{count}</span>
+                  <span className="font-semibold text-primary">{count}</span>
                 </div>
               ))
             ) : (
@@ -197,18 +206,19 @@ export default function AnalyticsPage() {
       </div>
 
       <div className="grid gap-6 lg:grid-cols-2">
-        <Card className="border-none shadow-sm">
-          <CardHeader>
+        <Card className={cardBaseStyles}>
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+          <CardHeader className="relative">
             <CardTitle className="text-base font-semibold">
               Top companies
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="relative space-y-4">
             {companies ? (
               <>
                 <div className="flex items-center justify-between text-sm text-muted-foreground">
                   <span>Total companies</span>
-                  <span className="font-semibold">
+                  <span className="font-semibold text-primary">
                     {companies.unique_companies}
                   </span>
                 </div>
@@ -216,7 +226,7 @@ export default function AnalyticsPage() {
                   {companies.top_companies.map((item) => (
                     <div key={item.company} className="flex items-center justify-between text-sm">
                       <span className="truncate text-muted-foreground">{item.company}</span>
-                      <span className="font-semibold">{item.count}</span>
+                      <span className="font-semibold text-primary">{item.count}</span>
                     </div>
                   ))}
                 </div>
@@ -227,19 +237,20 @@ export default function AnalyticsPage() {
           </CardContent>
         </Card>
 
-        <Card className="border-none shadow-sm">
-          <CardHeader>
+        <Card className={cardBaseStyles}>
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+          <CardHeader className="relative">
             <CardTitle className="text-base font-semibold">
               Sources breakdown
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="relative space-y-4">
             {sources ? (
               <div className="space-y-3">
                 {sources.top_sources.map((item) => (
                   <div key={item.source} className="flex items-center justify-between text-sm">
                     <span className="text-muted-foreground">{item.source}</span>
-                    <span className="font-semibold">{item.count}</span>
+                    <span className="font-semibold text-primary">{item.count}</span>
                   </div>
                 ))}
               </div>

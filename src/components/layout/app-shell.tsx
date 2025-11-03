@@ -28,6 +28,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const { user, signOut } = useAuth();
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
     setMobileNavOpen(false);
@@ -52,9 +53,18 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     router.push('/login');
   };
 
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      router.push(`/applications?search=${encodeURIComponent(searchQuery.trim())}`);
+    } else {
+      router.push('/applications');
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background text-foreground transition-colors">
-      <header className="border-b border-border bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/85">
+      <header className="sticky top-0 z-50 border-b border-border bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/85">
         <div className="mx-auto flex h-16 max-w-7xl items-center gap-6 px-4 sm:h-20 sm:px-6 lg:px-8">
           <Link href="/dashboard" className="text-lg font-semibold tracking-tight sm:text-2xl">
             JobMail
@@ -88,13 +98,15 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           </nav>
 
           <div className="ml-auto flex flex-1 items-center justify-end gap-3">
-            <div className="relative hidden max-w-sm flex-1 items-center md:flex">
+            <form onSubmit={handleSearch} className="relative hidden max-w-sm flex-1 items-center md:flex">
               <Search className="pointer-events-none absolute left-3 h-4 w-4 text-muted-foreground/60" />
               <Input
                 placeholder="Search applications..."
                 className="w-full rounded-full border border-border bg-muted/70 pl-10 text-sm text-foreground placeholder:text-muted-foreground/70"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
               />
-            </div>
+            </form>
 
             <ThemeToggle />
 

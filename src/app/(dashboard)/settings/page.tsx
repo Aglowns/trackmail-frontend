@@ -60,9 +60,11 @@ export default function SettingsPage() {
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
-  const [refreshToken, setRefreshToken] = useState<string | null>(null);
+  const [apiKey, setApiKey] = useState<string | null>(null);
+  const [apiKeys, setApiKeys] = useState<Array<{ id: string; name: string; created_at: string; last_used_at: string | null; expires_at: string | null }>>([]);
   const [tokenCopied, setTokenCopied] = useState(false);
   const [showToken, setShowToken] = useState(false);
+  const [generatingKey, setGeneratingKey] = useState(false);
 
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileSchema),
@@ -84,20 +86,20 @@ export default function SettingsPage() {
         form.reset(mapProfileToForm(data));
         setIsEditing(false);
         
-        // Get or create long-lived installation token (one-time)
-        console.log('=== INSTALLATION TOKEN DEBUG ===');
+        // Load API keys
         try {
-          const instToken = await apiClient.getInstallationToken();
-          setRefreshToken(instToken);
-          console.log('✅ Installation token issued');
-        } catch (e) {
-          console.error('❌ Failed to get installation token, falling back to access token', e);
-          try {
-            const token = await apiClient.getAccessToken();
-            setRefreshToken(token);
-          } catch (e2) {
-            toast.error('Failed to get token');
+          const keysData = await apiClient.listApiKeys();
+          setApiKeys(keysData.api_keys || []);
+          
+          // If user has an API key, show the first one
+          if (keysData.api_keys && keysData.api_keys.length > 0) {
+            // We can't show the actual key (security), but we can offer to create a new one
+            // Or show the first key's metadata
+            setApiKey(null); // We'll need to generate a new one to show it
           }
+        } catch (e) {
+          console.error('Failed to load API keys:', e);
+          // Don't show error - user might not have any yet
         }
       } catch (error) {
         console.error(error);
@@ -143,19 +145,38 @@ export default function SettingsPage() {
     setIsEditing(false);
   }
 
+  async function handleGenerateApiKey() {
+    try {
+      setGeneratingKey(true);
+      const keyData = await apiClient.issueApiKey('Gmail Add-on Key');
+      setApiKey(keyData.api_key);
+      
+      // Reload API keys list
+      const keysData = await apiClient.listApiKeys();
+      setApiKeys(keysData.api_keys || []);
+      
+      toast.success('API key generated successfully!');
+    } catch (error) {
+      console.error('Failed to generate API key:', error);
+      toast.error('Failed to generate API key');
+    } finally {
+      setGeneratingKey(false);
+    }
+  }
+
   async function handleCopyToken() {
-    if (!refreshToken) return;
+    if (!apiKey) return;
     
     try {
-      await navigator.clipboard.writeText(refreshToken);
+      await navigator.clipboard.writeText(apiKey);
       setTokenCopied(true);
-      toast.success('Token copied to clipboard!');
+      toast.success('API key copied to clipboard!');
       
       // Reset copied state after 3 seconds
       setTimeout(() => setTokenCopied(false), 3000);
     } catch (error) {
-      console.error('Failed to copy token:', error);
-      toast.error('Failed to copy token');
+      console.error('Failed to copy API key:', error);
+      toast.error('Failed to copy API key');
     }
   }
 
@@ -303,19 +324,19 @@ export default function SettingsPage() {
           <CardContent className="space-y-6">
             <div>
               <div className="mb-2">
-                <p className="text-sm font-medium text-foreground">Your Installation Token</p>
+                <p className="text-sm font-medium text-foreground">Your API Key</p>
                 <p className="text-sm text-muted-foreground">
-                  Copy this token and paste it into the Gmail add-on to connect your account. This is a one-time action.
+                  Generate an API key and paste it into the Gmail add-on to connect your account. API keys don&apos;t expire.
                 </p>
               </div>
               
-              {refreshToken ? (
+              {apiKey ? (
                 <div className="space-y-3">
                   <div className="flex gap-2">
                     <div className="relative flex-1">
                       <Input
                         readOnly
-                        value={refreshToken}
+                        value={apiKey}
                         className="font-mono text-xs pr-10"
                         type={showToken ? "text" : "password"}
                       />
@@ -323,7 +344,7 @@ export default function SettingsPage() {
                         type="button"
                         onClick={() => setShowToken(!showToken)}
                         className="absolute right-2 top-1/2 -translate-y-1/2 p-1 hover:bg-gray-100 rounded"
-                        aria-label={showToken ? "Hide token" : "Show token"}
+                        aria-label={showToken ? "Hide API key" : "Show API key"}
                       >
                         {showToken ? (
                           <EyeOff className="h-4 w-4 text-gray-500" />
@@ -350,15 +371,33 @@ export default function SettingsPage() {
                   <Alert>
                     <Info className="h-4 w-4" />
                     <AlertDescription className="text-sm">
-                      This is a long-lived installation token. Paste it once into the Gmail add-on and it will keep working automatically.
+                      This is your API key. It never expires, but you can revoke it at any time. Make sure to copy it now - you won&apos;t be able to see it again!
                     </AlertDescription>
                   </Alert>
                 </div>
               ) : (
-                <div className="flex items-center justify-center rounded-lg border border-dashed p-8">
+                <div className="flex flex-col items-center justify-center gap-4 rounded-lg border border-dashed p-8">
                   <div className="text-center">
-                    <Loader2 className="mx-auto h-8 w-8 animate-spin text-muted-foreground" />
-                    <p className="mt-2 text-sm text-muted-foreground">Loading token...</p>
+                    <p className="text-sm text-muted-foreground mb-4">
+                      {apiKeys.length > 0 
+                        ? "You already have API keys. Generate a new one to display it here (you can only see it once!)."
+                        : "Generate an API key to connect your Gmail add-on."
+                      }
+                    </p>
+                    <Button 
+                      onClick={handleGenerateApiKey} 
+                      disabled={generatingKey}
+                      variant="default"
+                    >
+                      {generatingKey ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          Generating...
+                        </>
+                      ) : (
+                        'Generate API Key'
+                      )}
+                    </Button>
                   </div>
                 </div>
               )}
@@ -367,11 +406,12 @@ export default function SettingsPage() {
             <div className="rounded-xl bg-muted/60 p-5">
               <p className="mb-2 text-sm font-medium text-foreground">Setup Instructions:</p>
               <ol className="list-decimal space-y-2 pl-5 text-sm text-muted-foreground">
-                <li>Copy the token above by clicking the &quot;Copy&quot; button</li>
+                <li>Click &quot;Generate API Key&quot; above to create your key</li>
+                <li>Copy the API key by clicking the &quot;Copy&quot; button</li>
                 <li>Open Gmail and click the JobMail add-on icon in the sidebar</li>
                 <li>Click &quot;Get Started&quot; and then &quot;Paste Token&quot;</li>
-                <li>Paste the token and click &quot;Connect&quot;</li>
-                <li>That&apos;s it! You won&apos;t need to paste a token again.</li>
+                <li>Paste the API key and click &quot;Connect&quot;</li>
+                <li>That&apos;s it! Your API key never expires, so you won&apos;t need to paste it again.</li>
               </ol>
             </div>
 
@@ -384,7 +424,7 @@ export default function SettingsPage() {
                   One-time Setup
                 </p>
                 <p className="mt-1 text-sm text-blue-700 dark:text-blue-300">
-                  This token is designed for one-time installation. The add-on will use it automatically; you won&apos;t need to copy new tokens.
+                  API keys are simple, long-lived tokens that don&apos;t expire. They&apos;re much more reliable than JWT tokens for Gmail add-on integration.
                 </p>
               </div>
             </div>

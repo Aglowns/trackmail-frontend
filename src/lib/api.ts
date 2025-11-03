@@ -246,6 +246,29 @@ class ApiClient {
     );
     return response.data.installation_token;
   }
+
+  // API Key endpoints for Gmail add-on integration
+  async issueApiKey(name = 'Gmail Add-on Key'): Promise<{ api_key: string; created_at: string; name: string; expires_at: string | null }> {
+    const response = await this.client.post<{ api_key: string; created_at: string; name: string; expires_at: string | null }>(
+      '/v1/api-keys/issue',
+      { name }
+    );
+    return response.data;
+  }
+
+  async listApiKeys(): Promise<{ api_keys: Array<{ id: string; name: string; created_at: string; last_used_at: string | null; expires_at: string | null }> }> {
+    const response = await this.client.get<{ api_keys: Array<{ id: string; name: string; created_at: string; last_used_at: string | null; expires_at: string | null }> }>(
+      '/v1/api-keys'
+    );
+    return response.data;
+  }
+
+  async revokeApiKey(keyId: string): Promise<{ message: string }> {
+    const response = await this.client.delete<{ message: string }>(
+      `/v1/api-keys/${keyId}`
+    );
+    return response.data;
+  }
 }
 
 // Export singleton instance

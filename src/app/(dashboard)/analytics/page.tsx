@@ -69,8 +69,8 @@ export default function AnalyticsPage() {
 
   if (loading) {
     return (
-      <div className="flex min-h-[300px] items-center justify-center rounded-2xl border border-dashed border-slate-200 bg-white">
-        <div className="flex items-center gap-2 text-slate-500">
+      <div className="flex min-h-[300px] items-center justify-center rounded-2xl border border-dashed border-border">
+        <div className="flex items-center gap-2 text-muted-foreground">
           <Loader2 className="h-5 w-5 animate-spin" />
           Loading analytics...
         </div>
@@ -81,8 +81,8 @@ export default function AnalyticsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-semibold text-slate-900">Analytics</h1>
-        <p className="text-sm text-slate-500">
+        <h1 className="text-2xl font-semibold">Analytics</h1>
+        <p className="text-sm text-muted-foreground">
           Monitor your application pipeline with insights and trends
         </p>
       </div>
@@ -90,45 +90,45 @@ export default function AnalyticsPage() {
       {overview && (
         <div className="-mx-4 overflow-x-auto pb-2 sm:mx-0">
           <div className="flex min-w-[720px] gap-4 px-4 md:grid md:min-w-0 md:grid-cols-2 xl:grid-cols-4 md:px-0">
-            <Card className="border-none bg-white shadow-sm">
+            <Card className="border-none shadow-sm">
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-slate-500">Total Applications</CardTitle>
+                <CardTitle className="text-sm font-medium text-muted-foreground">Total Applications</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-3xl font-semibold text-slate-900">
+                <p className="text-3xl font-semibold">
                   {formatNumber(overview.total_applications)}
                 </p>
               </CardContent>
             </Card>
 
-            <Card className="border-none bg-white shadow-sm">
+            <Card className="border-none shadow-sm">
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-slate-500">Applied last 30 days</CardTitle>
+                <CardTitle className="text-sm font-medium text-muted-foreground">Applied last 30 days</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-3xl font-semibold text-slate-900">
+                <p className="text-3xl font-semibold">
                   {formatNumber(overview.applications_this_month)}
                 </p>
               </CardContent>
             </Card>
 
-            <Card className="border-none bg-white shadow-sm">
+            <Card className="border-none shadow-sm">
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-slate-500">Response rate</CardTitle>
+                <CardTitle className="text-sm font-medium text-muted-foreground">Response rate</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-3xl font-semibold text-slate-900">
+                <p className="text-3xl font-semibold">
                   {overview.response_rate}%
                 </p>
               </CardContent>
             </Card>
 
-            <Card className="border-none bg-white shadow-sm">
+            <Card className="border-none shadow-sm">
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-slate-500">Active pipelines</CardTitle>
+                <CardTitle className="text-sm font-medium text-muted-foreground">Active pipelines</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-3xl font-semibold text-slate-900">
+                <p className="text-3xl font-semibold">
                   {
                     Object.keys(overview.status_counts).filter(
                       (status) => status !== 'applied',
@@ -142,16 +142,16 @@ export default function AnalyticsPage() {
       )}
 
       <div className="grid gap-6 lg:grid-cols-3">
-        <Card className="border-none bg-white shadow-sm lg:col-span-2">
+        <Card className="border-none shadow-sm lg:col-span-2">
           <CardHeader>
-            <CardTitle className="text-base font-semibold text-slate-900">
+            <CardTitle className="text-base font-semibold">
               Applications trend
             </CardTitle>
           </CardHeader>
           <CardContent>
             {trends ? (
               <div className="space-y-3">
-                <div className="flex items-center justify-between text-sm text-slate-500">
+                <div className="flex items-center justify-between text-sm text-muted-foreground">
                   <span>Last 30 days</span>
                   <span>{trends.total_in_period} total submissions</span>
                 </div>
@@ -159,10 +159,10 @@ export default function AnalyticsPage() {
                   {trends.trend_data.map((point) => (
                     <div key={point.date} className="flex h-24 flex-col justify-end">
                       <div
-                        className="rounded-t-md bg-indigo-200"
+                        className="rounded-t-md bg-indigo-200 dark:bg-indigo-500"
                         style={{ height: `${Math.min(100, point.applications * 20)}%` }}
                       />
-                      <span className="truncate pt-2 text-[11px] text-slate-400">
+                      <span className="truncate pt-2 text-[11px] text-muted-foreground">
                         {new Date(point.date).getDate()}
                       </span>
                     </div>
@@ -170,14 +170,14 @@ export default function AnalyticsPage() {
                 </div>
               </div>
             ) : (
-              <p className="text-sm text-slate-500">No trend data available</p>
+              <p className="text-sm text-muted-foreground">No trend data available</p>
             )}
           </CardContent>
         </Card>
 
-        <Card className="border-none bg-white shadow-sm">
+        <Card className="border-none shadow-sm">
           <CardHeader>
-            <CardTitle className="text-base font-semibold text-slate-900">
+            <CardTitle className="text-base font-semibold">
               Pipeline status
             </CardTitle>
           </CardHeader>
@@ -185,51 +185,51 @@ export default function AnalyticsPage() {
             {overview ? (
               Object.entries(overview.status_counts).map(([status, count]) => (
                 <div key={status} className="flex items-center justify-between text-sm">
-                  <span className="text-slate-600">{formatStatus(status)}</span>
-                  <span className="font-semibold text-slate-900">{count}</span>
+                  <span className="text-muted-foreground">{formatStatus(status)}</span>
+                  <span className="font-semibold">{count}</span>
                 </div>
               ))
             ) : (
-              <p className="text-sm text-slate-500">No status data available</p>
+              <p className="text-sm text-muted-foreground">No status data available</p>
             )}
           </CardContent>
         </Card>
       </div>
 
       <div className="grid gap-6 lg:grid-cols-2">
-        <Card className="border-none bg-white shadow-sm">
+        <Card className="border-none shadow-sm">
           <CardHeader>
-            <CardTitle className="text-base font-semibold text-slate-900">
+            <CardTitle className="text-base font-semibold">
               Top companies
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             {companies ? (
               <>
-                <div className="flex items-center justify-between text-sm text-slate-500">
+                <div className="flex items-center justify-between text-sm text-muted-foreground">
                   <span>Total companies</span>
-                  <span className="font-semibold text-slate-900">
+                  <span className="font-semibold">
                     {companies.unique_companies}
                   </span>
                 </div>
                 <div className="space-y-3">
                   {companies.top_companies.map((item) => (
                     <div key={item.company} className="flex items-center justify-between text-sm">
-                      <span className="truncate text-slate-600">{item.company}</span>
-                      <span className="font-semibold text-slate-900">{item.count}</span>
+                      <span className="truncate text-muted-foreground">{item.company}</span>
+                      <span className="font-semibold">{item.count}</span>
                     </div>
                   ))}
                 </div>
               </>
             ) : (
-              <p className="text-sm text-slate-500">No company data available</p>
+              <p className="text-sm text-muted-foreground">No company data available</p>
             )}
           </CardContent>
         </Card>
 
-        <Card className="border-none bg-white shadow-sm">
+        <Card className="border-none shadow-sm">
           <CardHeader>
-            <CardTitle className="text-base font-semibold text-slate-900">
+            <CardTitle className="text-base font-semibold">
               Sources breakdown
             </CardTitle>
           </CardHeader>
@@ -238,13 +238,13 @@ export default function AnalyticsPage() {
               <div className="space-y-3">
                 {sources.top_sources.map((item) => (
                   <div key={item.source} className="flex items-center justify-between text-sm">
-                    <span className="text-slate-600">{item.source}</span>
-                    <span className="font-semibold text-slate-900">{item.count}</span>
+                    <span className="text-muted-foreground">{item.source}</span>
+                    <span className="font-semibold">{item.count}</span>
                   </div>
                 ))}
               </div>
             ) : (
-              <p className="text-sm text-slate-500">No source data available</p>
+              <p className="text-sm text-muted-foreground">No source data available</p>
             )}
           </CardContent>
         </Card>

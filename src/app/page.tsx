@@ -340,24 +340,24 @@ export default function LandingPage() {
           </div>
         </section>
 
-        <section id="how-it-works" className="bg-white/60">
+        <section id="how-it-works" className="bg-white/60 transition-colors dark:bg-slate-900/40">
           <div className="mx-auto max-w-5xl px-4 py-20 sm:px-6 lg:px-8">
             <div className="text-center">
-              <h2 className="text-2xl font-semibold tracking-tight text-slate-900 sm:text-3xl">
+              <h2 className="text-2xl font-semibold tracking-tight text-slate-900 transition dark:text-white sm:text-3xl">
                 How it works
               </h2>
-              <p className="mt-3 text-base text-slate-600">
+              <p className="mt-3 text-base text-slate-600 transition dark:text-slate-300">
                 Get started in minutes with our simple three-step process.
               </p>
             </div>
             <div className="mt-12 grid gap-8 md:grid-cols-3">
               {howItWorks.map((item) => (
-                <div key={item.step} className="flex flex-col gap-4 rounded-2xl border border-slate-200 bg-white/90 p-8">
-                  <span className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-900/5 text-sm font-semibold text-slate-700">
+                <div key={item.step} className="flex flex-col gap-4 rounded-2xl border border-slate-200 bg-white/90 p-8 transition dark:border-slate-800 dark:bg-slate-900/70">
+                  <span className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-900/5 text-sm font-semibold text-slate-700 transition dark:bg-slate-700/20 dark:text-slate-200">
                     {item.step}
                   </span>
-                  <h3 className="text-lg font-semibold text-slate-900">{item.title}</h3>
-                  <p className="text-sm text-slate-600">{item.description}</p>
+                  <h3 className="text-lg font-semibold text-slate-900 transition dark:text-white">{item.title}</h3>
+                  <p className="text-sm text-slate-600 transition dark:text-slate-300">{item.description}</p>
                 </div>
               ))}
             </div>
@@ -380,8 +380,8 @@ export default function LandingPage() {
                 onClick={() => setBillingCycle('monthly')}
                 className={`rounded-full px-4 py-2 transition ${
                   billingCycle === 'monthly'
-                    ? 'bg-slate-900 text-white shadow-sm dark:bg-white dark:text-slate-900'
-                    : 'text-slate-500 hover:text-slate-700 dark:text-slate-300 dark:hover:text-white'
+                    ? 'bg-slate-900 text-white shadow-sm dark:bg-indigo-600 dark:text-white'
+                    : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-white'
                 }`}
               >
                 Monthly
@@ -391,8 +391,8 @@ export default function LandingPage() {
                 onClick={() => setBillingCycle('annual')}
                 className={`rounded-full px-4 py-2 transition ${
                   billingCycle === 'annual'
-                    ? 'bg-slate-900 text-white shadow-sm dark:bg-white dark:text-slate-900'
-                    : 'text-slate-500 hover:text-slate-700 dark:text-slate-300 dark:hover:text-white'
+                    ? 'bg-slate-900 text-white shadow-sm dark:bg-indigo-600 dark:text-white'
+                    : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-white'
                 }`}
               >
                 Annual
@@ -407,27 +407,29 @@ export default function LandingPage() {
                 <div
                   key={plan.name}
                   className={`flex h-full flex-col rounded-3xl border border-slate-200 bg-white/90 p-8 shadow-sm transition hover:-translate-y-1 hover:shadow-xl ${
-                    plan.highlight ? 'ring-2 ring-indigo-100 dark:ring-indigo-400/40' : 'dark:border-slate-800 dark:bg-slate-900/70'
-                  }`}
+                    plan.highlight 
+                      ? 'ring-2 ring-indigo-100 dark:ring-indigo-500/30' 
+                      : 'dark:border-slate-800 dark:bg-slate-900/70'
+                  } ${plan.highlight ? 'dark:bg-slate-900 dark:ring-slate-700' : ''}`}
                 >
                   <div className="flex items-center justify-between">
-                    <h3 className="text-xl font-semibold text-slate-900 dark:text-white">{plan.name}</h3>
+                    <h3 className="text-xl font-semibold text-slate-900 dark:text-white transition">{plan.name}</h3>
                     {plan.badge && (
-                      <span className="rounded-full bg-indigo-50 px-3 py-1 text-xs font-semibold text-indigo-600">
+                      <span className="rounded-full bg-indigo-50 px-3 py-1 text-xs font-semibold text-indigo-600 transition dark:bg-indigo-950 dark:text-indigo-300">
                         {plan.badge}
                       </span>
                     )}
                   </div>
-                  <p className="mt-3 text-sm text-slate-600 dark:text-slate-300">{plan.description}</p>
+                  <p className="mt-3 text-sm text-slate-600 dark:text-slate-300 transition">{plan.description}</p>
                   <div className="mt-6 flex items-baseline gap-2">
-                    <span className="text-3xl font-semibold text-slate-900 dark:text-white">
+                    <span className="text-3xl font-semibold text-slate-900 dark:text-white transition">
                       {isFree ? '$0' : `$${price}`}
                     </span>
-                    <span className="text-sm text-slate-500 dark:text-slate-300">
+                    <span className="text-sm text-slate-500 dark:text-slate-400 transition">
                       {billingCycle === 'monthly' ? '/month' : '/month (billed annually)'}
                     </span>
                   </div>
-                  <ul className="mt-6 space-y-3 text-sm text-slate-600 dark:text-slate-300">
+                  <ul className="mt-6 space-y-3 text-sm text-slate-600 dark:text-slate-300 transition">
                     {plan.perks.map((perk) => (
                       <li key={perk} className="flex items-start gap-2">
                         <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-indigo-500 dark:bg-indigo-400" />
@@ -440,7 +442,7 @@ export default function LandingPage() {
                       asChild
                       size="lg"
                       variant={plan.highlight ? 'default' : 'outline'}
-                      className={plan.highlight ? 'w-full shadow-md dark:bg-white dark:text-slate-900' : 'w-full border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-900'}
+                      className="w-full"
                     >
                       <Link href={plan.ctaHref}>{plan.ctaLabel}</Link>
                     </Button>
@@ -501,17 +503,17 @@ export default function LandingPage() {
       <footer className="border-t border-slate-200 bg-white/80 transition-colors dark:border-slate-800 dark:bg-slate-950/80">
         <div className="mx-auto grid max-w-6xl gap-8 px-4 py-16 text-sm text-slate-600 transition dark:text-slate-300 sm:grid-cols-2 md:grid-cols-4 sm:px-6 lg:px-8">
           <div className="space-y-3">
-            <Link href="/" className="text-lg font-semibold text-slate-900 sm:text-xl">
+            <Link href="/" className="text-lg font-semibold text-slate-900 transition dark:text-white sm:text-xl">
               JobMail
             </Link>
-            <p className="text-sm text-slate-600">
+            <p className="text-sm text-slate-600 transition dark:text-slate-400">
               Automatically track your job applications from Gmail with intelligent parsing and analytics.
             </p>
-            <div className="flex gap-4 text-slate-500">
-              <Link href="https://twitter.com" aria-label="JobMail on Twitter">
+            <div className="flex gap-4 text-slate-500 transition dark:text-slate-400">
+              <Link href="https://twitter.com" aria-label="JobMail on Twitter" className="hover:text-slate-700 dark:hover:text-white">
                 X
               </Link>
-              <Link href="https://github.com" aria-label="JobMail on GitHub">
+              <Link href="https://github.com" aria-label="JobMail on GitHub" className="hover:text-slate-700 dark:hover:text-white">
                 GitHub
               </Link>
             </div>
@@ -519,13 +521,13 @@ export default function LandingPage() {
           <div className="grid gap-10 sm:grid-cols-2 md:grid-cols-1 md:gap-12 lg:col-span-3 lg:grid-cols-3">
             {Object.entries(footerLinks).map(([section, links]) => (
               <div key={section} className="space-y-4 text-sm">
-                <h4 className="text-sm font-semibold uppercase tracking-wider text-slate-500">
+                <h4 className="text-sm font-semibold uppercase tracking-wider text-slate-500 transition dark:text-slate-400">
                   {section.charAt(0).toUpperCase() + section.slice(1)}
                 </h4>
-                <ul className="space-y-2 text-slate-600">
+                <ul className="space-y-2 text-slate-600 transition dark:text-slate-400">
                   {links.map((link) => (
                     <li key={link.label}>
-                      <Link href={link.href} className="transition hover:text-slate-900">
+                      <Link href={link.href} className="transition hover:text-slate-900 dark:hover:text-white">
                         {link.label}
                       </Link>
                     </li>
@@ -535,17 +537,17 @@ export default function LandingPage() {
             ))}
           </div>
         </div>
-        <div className="border-t border-slate-200/70 bg-white/60 py-6">
-          <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-3 px-4 text-xs text-slate-500 sm:flex-row sm:px-6 lg:px-8">
+        <div className="border-t border-slate-200/70 bg-white/60 py-6 transition dark:border-slate-800/70 dark:bg-slate-950/60">
+          <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-3 px-4 text-xs text-slate-500 transition dark:text-slate-400 sm:flex-row sm:px-6 lg:px-8">
             <p>© {new Date().getFullYear()} JobMail. All rights reserved.</p>
             <div className="flex gap-4">
-              <Link href="#privacy" className="transition hover:text-slate-700">
+              <Link href="#privacy" className="transition hover:text-slate-700 dark:hover:text-white">
                 Privacy
               </Link>
-              <Link href="#terms" className="transition hover:text-slate-700">
+              <Link href="#terms" className="transition hover:text-slate-700 dark:hover:text-white">
                 Terms
               </Link>
-              <Link href="mailto:hello@trackmail.app" className="transition hover:text-slate-700">
+              <Link href="mailto:hello@trackmail.app" className="transition hover:text-slate-700 dark:hover:text-white">
                 Contact
               </Link>
             </div>

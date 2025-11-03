@@ -70,21 +70,23 @@ class ApiClient {
     if (filters?.search) params.append('search', filters.search);
     if (filters?.date_from) params.append('date_from', filters.date_from);
     if (filters?.date_to) params.append('date_to', filters.date_to);
-    params.append('page', page.toString());
+    params.append('skip', ((page - 1) * limit).toString());  // Backend uses skip/limit, not page/limit!
     params.append('limit', limit.toString());
 
+    console.log('GET /v1/applications with params:', params.toString());
     const response: AxiosResponse<{
-      status: string;
-      applications: Application[];
-      count: number;
-      total_pages?: number;
+      items: Application[];
+      total: number;
+      skip: number;
+      limit: number;
     }> = await this.client.get(`/v1/applications?${params.toString()}`);
 
-    const total = response.data.count ?? response.data.applications?.length ?? 0;
-    const totalPages = response.data.total_pages ?? Math.ceil(total / limit);
+    console.log('API Response:', response.data);
+    const total = response.data.total ?? 0;
+    const totalPages = Math.ceil(total / limit);
 
     return {
-      applications: response.data.applications ?? [],
+      applications: response.data.items ?? [],
       total,
       page,
       limit,

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Loader2, Download, Plus, Filter } from 'lucide-react';
 import Link from 'next/link';
@@ -39,7 +39,7 @@ const statusOptions: { value: ApplicationStatus | 'all'; label: string }[] = [
 const sources = ['All Sources', 'LinkedIn', 'Company', 'Indeed', 'Referral', 'Glassdoor'];
 const dateRanges = ['Date Applied', 'Last Updated'];
 
-export default function ApplicationsPage() {
+function ApplicationsContent() {
   const searchParams = useSearchParams();
   const [loading, setLoading] = useState(false);
   const [filters, setFilters] = useState<ApplicationFilters>({ status: 'all' });
@@ -59,10 +59,14 @@ export default function ApplicationsPage() {
     async function fetchApplications() {
       try {
         setLoading(true);
+        console.log('Fetching with filters:', activeFilters);
         const result = await apiClient.getApplications(activeFilters, 1, 100);
-        setApplications(result.applications);
+        console.log('Fetched applications result:', JSON.stringify(result, null, 2));
+        console.log('Applications array:', result.applications);
+        console.log('Applications count:', result.applications?.length);
+        setApplications(result.applications || []);
       } catch (error) {
-        console.error(error);
+        console.error('Error fetching applications:', error);
         toast.error('Unable to load applications');
       } finally {
         setLoading(false);
@@ -263,5 +267,25 @@ export default function ApplicationsPage() {
         </CardContent>
       </Card>
     </div>
+  );
+}
+
+export default function ApplicationsPage() {
+  return (
+    <Suspense fallback={
+      <div className="space-y-6">
+        <Card className="border-none shadow-sm">
+          <CardContent className="p-4 sm:p-6">
+            <div className="flex min-h-[400px] items-center justify-center">
+              <div className="flex items-center gap-2 text-muted-foreground">
+                <Loader2 className="h-5 w-5 animate-spin" /> Loading...
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    }>
+      <ApplicationsContent />
+    </Suspense>
   );
 }

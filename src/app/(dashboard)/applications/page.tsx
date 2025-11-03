@@ -246,7 +246,20 @@ function ApplicationsContent() {
                       <TableCell>
                         <span className="text-sm text-muted-foreground">{application.confidence ?? '—'}</span>
                       </TableCell>
-                      <TableCell>{application.source ?? '—'}</TableCell>
+                      <TableCell>
+                        {application.source_url ? (
+                          <a 
+                            href={application.source_url} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="text-sm text-primary hover:underline"
+                          >
+                            {application.source || 'Link'}
+                          </a>
+                        ) : (
+                          application.source ?? '—'
+                        )}
+                      </TableCell>
                       <TableCell className="text-right">
                         <Link
                           href={`/applications/${application.id}`}

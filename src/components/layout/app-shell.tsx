@@ -68,7 +68,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       <header className="sticky top-0 z-50 border-b border-border bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/85">
         <div className="mx-auto flex h-16 max-w-7xl items-center gap-6 px-4 sm:h-20 sm:px-6 lg:px-8">
           <Link href="/dashboard" className="flex items-center gap-2 text-lg font-semibold tracking-tight sm:text-2xl">
-            <Image src="/logo.svg" alt="Jobmail" width={120} height={40} className="h-8 w-auto" priority unoptimized />
+            <Image src="/logo.svg" alt="Jobmail" width={120} height={40} className="h-8 w-auto" priority />
           </Link>
 
           <button

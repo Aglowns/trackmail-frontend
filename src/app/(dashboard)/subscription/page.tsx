@@ -31,6 +31,7 @@ export default function SubscriptionPage() {
   const [loadingPlans, setLoadingPlans] = useState(true);
   const [checkoutLoading, setCheckoutLoading] = useState(false);
   const [upgradeOpen, setUpgradeOpen] = useState(false);
+  const [preferredPlanName, setPreferredPlanName] = useState<string | null>(null);
 
   useEffect(() => {
     async function loadStatus() {
@@ -130,15 +131,55 @@ export default function SubscriptionPage() {
         </div>
       </header>
 
-      <SubscriptionLimitIndicator
-        planName={planDisplayName}
-        applicationsCount={usage?.applications_count ?? 0}
-        applicationsLimit={usage?.applications_limit}
-        features={features}
-        isLoading={checkoutLoading}
-        onUpgradeClick={() => setUpgradeOpen(true)}
-        showUpgradeCta
-      />
+      <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
+        <SubscriptionLimitIndicator
+          planName={planDisplayName}
+          applicationsCount={usage?.applications_count ?? 0}
+          applicationsLimit={usage?.applications_limit}
+          features={features}
+          isLoading={checkoutLoading}
+          onUpgradeClick={() => {
+            const defaultPlan =
+              plans.find((plan) => plan.name !== currentPlanName)?.name ?? 'pro';
+            setPreferredPlanName(defaultPlan);
+            setUpgradeOpen(true);
+          }}
+          showUpgradeCta
+        />
+
+        <div className="relative overflow-hidden rounded-3xl border border-border/60 bg-card/80 p-6 shadow-lg shadow-primary/10">
+          <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-transparent to-transparent opacity-70 blur-3xl" />
+          <div className="relative space-y-4">
+            <h3 className="text-lg font-semibold text-foreground">Why upgrade to Pro?</h3>
+            <ul className="space-y-3 text-sm text-muted-foreground">
+              <li className="flex items-start gap-2">
+                <Check className="mt-0.5 h-4 w-4 text-primary" />
+                <span>Automatic tracking of every job lead straight from Gmail.</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <Check className="mt-0.5 h-4 w-4 text-primary" />
+                <span>Advanced analytics to uncover patterns in your job search.</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <Check className="mt-0.5 h-4 w-4 text-primary" />
+                <span>Unlimited applications with AI-powered insights.</span>
+              </li>
+            </ul>
+            <Button
+              variant="outline"
+              onClick={() => {
+                const defaultPlan =
+                  plans.find((plan) => plan.name !== currentPlanName)?.name ?? 'pro';
+                setPreferredPlanName(defaultPlan);
+                setUpgradeOpen(true);
+              }}
+              className="w-full justify-center gap-2 border-primary/40 text-primary hover:bg-primary/10"
+            >
+              Explore Pro Benefits
+            </Button>
+          </div>
+        </div>
+      </div>
 
       <section className="space-y-4">
         <div className="flex items-center justify-between">
@@ -148,17 +189,36 @@ export default function SubscriptionPage() {
               Compare what&apos;s included in each plan and choose the best fit for your job search.
             </p>
           </div>
-          <Button onClick={() => setUpgradeOpen(true)} disabled={loading || checkoutLoading}>
+          <Button
+            onClick={() => {
+              const defaultPlan =
+                plans.find((plan) => plan.name !== currentPlanName)?.name ?? 'pro';
+              setPreferredPlanName(defaultPlan);
+              setUpgradeOpen(true);
+            }}
+            disabled={loading || checkoutLoading}
+          >
             Upgrade Plan
           </Button>
         </div>
 
         {loading ? (
-          <div className="flex min-h-[220px] items-center justify-center rounded-2xl border border-dashed border-border/70 bg-card/60">
-            <div className="flex items-center gap-2 text-muted-foreground">
-              <Loader2 className="h-5 w-5 animate-spin" />
-              Loading subscription details...
-            </div>
+          <div className="grid gap-4 md:grid-cols-2">
+            {Array.from({ length: 2 }).map((_, index) => (
+              <div
+                key={index}
+                className="h-full rounded-3xl border border-border/60 bg-card/70 p-6 shadow-sm shadow-primary/5"
+              >
+                <div className="flex animate-pulse flex-col gap-4">
+                  <div className="h-4 w-32 rounded-full bg-muted" />
+                  <div className="h-8 w-1/3 rounded-full bg-muted" />
+                  <div className="h-3 w-full rounded-full bg-muted/70" />
+                  <div className="h-3 w-5/6 rounded-full bg-muted/70" />
+                  <div className="h-3 w-4/6 rounded-full bg-muted/70" />
+                  <div className="h-10 w-full rounded-full bg-muted/70" />
+                </div>
+              </div>
+            ))}
           </div>
         ) : (
           <div className="grid gap-4 md:grid-cols-2">
@@ -167,6 +227,10 @@ export default function SubscriptionPage() {
                 key={plan.id}
                 plan={plan}
                 current={plan.id === currentPlan?.id}
+                onSelect={(selectedPlan) => {
+                  setPreferredPlanName(selectedPlan.name);
+                  setUpgradeOpen(true);
+                }}
               />
             ))}
           </div>
@@ -179,7 +243,13 @@ export default function SubscriptionPage() {
         onUpgrade={handleUpgrade}
         isProcessing={checkoutLoading}
         open={upgradeOpen}
-        onOpenChange={setUpgradeOpen}
+        onOpenChange={(openState) => {
+          setUpgradeOpen(openState);
+          if (!openState) {
+            setPreferredPlanName(null);
+          }
+        }}
+        initialPlanName={preferredPlanName ?? undefined}
       />
     </div>
   );
@@ -188,20 +258,38 @@ export default function SubscriptionPage() {
 interface PlanSummaryCardProps {
   plan: SubscriptionPlan;
   current?: boolean;
+  onSelect?: (plan: SubscriptionPlan) => void;
 }
 
-function PlanSummaryCard({ plan, current = false }: PlanSummaryCardProps) {
+function PlanSummaryCard({ plan, current = false, onSelect }: PlanSummaryCardProps) {
   const features = plan.features ?? {};
   const priceMonthly = Number(plan.price_monthly ?? 0);
   const priceYearly = Number(plan.price_yearly ?? 0);
 
+  const featureList = useMemo(() => {
+    const list: Array<{ enabled: boolean; label: string }> = [
+      {
+        enabled: Boolean(features.unlimited_applications),
+        label: features.unlimited_applications
+          ? 'Unlimited tracked applications'
+          : `${features.max_applications ?? 25} tracked applications`,
+      },
+      { enabled: Boolean(features.auto_tracking), label: 'Automatic Gmail email tracking' },
+      { enabled: Boolean(features.advanced_analytics), label: 'Advanced analytics dashboard' },
+      { enabled: Boolean(features.export_data), label: 'Export your data (CSV & JSON)' },
+    ];
+
+    return list.filter((item) => item.label);
+  }, [features]);
+
   return (
     <Card
       className={cn(
-        'relative overflow-hidden border border-border/70 bg-card/80 shadow-sm transition hover:-translate-y-1 hover:shadow-lg hover:shadow-primary/20',
+        'relative overflow-hidden border border-border/60 bg-card/80 shadow-lg shadow-primary/5 transition hover:-translate-y-1 hover:shadow-primary/20',
         current && 'border-primary/60 shadow-primary/30',
       )}
     >
+      <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-transparent opacity-0 transition-opacity duration-300 hover:opacity-100" />
       <CardHeader className="space-y-3">
         <div className="flex items-center justify-between">
           <div>
@@ -232,21 +320,29 @@ function PlanSummaryCard({ plan, current = false }: PlanSummaryCardProps) {
           </div>
         </div>
       </CardHeader>
-      <CardContent className="space-y-3 text-sm text-muted-foreground">
-        <FeatureItem enabled>
-          {features.unlimited_applications
-            ? 'Unlimited tracked applications'
-            : `${features.max_applications ?? 25} tracked applications`}
-        </FeatureItem>
-        <FeatureItem enabled={Boolean(features.auto_tracking)}>
-          Automatic Gmail email tracking
-        </FeatureItem>
-        <FeatureItem enabled={Boolean(features.advanced_analytics)}>
-          Advanced analytics dashboard
-        </FeatureItem>
-        <FeatureItem enabled={Boolean(features.export_data)}>
-          Export your application data (CSV & JSON)
-        </FeatureItem>
+      <CardContent className="space-y-4 text-sm text-muted-foreground">
+        <div className="space-y-2">
+          {featureList.map((feature) => (
+            <FeatureItem key={feature.label} enabled={feature.enabled}>
+              {feature.label}
+            </FeatureItem>
+          ))}
+        </div>
+
+        {current ? (
+          <div className="flex items-center gap-2 rounded-lg border border-emerald-500/40 bg-emerald-500/10 px-3 py-2 text-sm font-medium text-emerald-600">
+            <Check className="h-4 w-4" />
+            You&apos;re on this plan
+          </div>
+        ) : (
+          <Button
+            variant="outline"
+            className="w-full justify-center gap-2 border-primary/40 text-primary hover:bg-primary/10"
+            onClick={() => onSelect?.(plan)}
+          >
+            Choose {plan.display_name}
+          </Button>
+        )}
       </CardContent>
     </Card>
   );

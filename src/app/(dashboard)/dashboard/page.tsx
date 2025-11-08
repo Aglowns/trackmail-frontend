@@ -107,6 +107,25 @@ export default function DashboardPage() {
     }));
   }, [columns]);
 
+  const totalApplications = useMemo(
+    () =>
+      Object.values(columns).reduce((sum, apps) => {
+        if (!Array.isArray(apps)) return sum;
+        return sum + apps.length;
+      }, 0),
+    [columns],
+  );
+
+  const interviewsCount = (columns.interviewing?.length ?? 0) +
+    (columns.interview_scheduled?.length ?? 0) +
+    (columns.interview_completed?.length ?? 0) +
+    (columns.screening?.length ?? 0);
+
+  const offersCount =
+    (columns.offer?.length ?? 0) + (columns.offer_received?.length ?? 0) + (columns.accepted?.length ?? 0);
+
+  const rejectedCount = columns.rejected?.length ?? 0;
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -120,6 +139,32 @@ export default function DashboardPage() {
             Add Application
           </Link>
         </Button>
+      </div>
+
+      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <StatCard
+          title="Total Applications"
+          value={totalApplications}
+          trendLabel="All time submissions"
+        />
+        <StatCard
+          title="Interview Pipeline"
+          value={interviewsCount}
+          trendLabel="Interviews and screenings"
+          tone="primary"
+        />
+        <StatCard
+          title="Offers Received"
+          value={offersCount}
+          trendLabel="Offers & acceptances"
+          tone="success"
+        />
+        <StatCard
+          title="Rejections"
+          value={rejectedCount}
+          trendLabel="Stay resilient!"
+          tone="warning"
+        />
       </div>
 
       <SubscriptionLimitIndicator
@@ -217,5 +262,38 @@ export default function DashboardPage() {
         </div>
       )}
     </div>
+  );
+}
+
+interface StatCardProps {
+  title: string;
+  value: number;
+  trendLabel: string;
+  tone?: 'default' | 'primary' | 'success' | 'warning';
+}
+
+function StatCard({ title, value, trendLabel, tone = 'default' }: StatCardProps) {
+  const toneStyles =
+    tone === 'primary'
+      ? 'bg-primary/10 text-primary border-primary/40'
+      : tone === 'success'
+        ? 'bg-emerald-500/10 text-emerald-600 border-emerald-500/40'
+        : tone === 'warning'
+          ? 'bg-amber-500/10 text-amber-600 border-amber-500/40'
+          : 'bg-muted/60 text-muted-foreground border-border/60';
+
+  return (
+    <Card className="relative overflow-hidden border border-border/60 bg-card/80 shadow-sm shadow-primary/5 transition hover:shadow-primary/20">
+      <div className="absolute inset-x-0 top-0 h-20 bg-gradient-to-br from-primary/10 via-transparent to-transparent opacity-0 transition-opacity duration-300 hover:opacity-100" />
+      <CardHeader className="relative pb-2">
+        <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{title}</p>
+      </CardHeader>
+      <CardContent className="relative space-y-2">
+        <div className="text-3xl font-semibold text-foreground">{value}</div>
+        <span className={`inline-flex w-fit items-center rounded-full px-3 py-1 text-xs font-medium ${toneStyles}`}>
+          {trendLabel}
+        </span>
+      </CardContent>
+    </Card>
   );
 }

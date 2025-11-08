@@ -118,5 +118,11 @@
   }
   body {
     @apply bg-background text-foreground;
+    background-image:
+      radial-gradient(1200px circle at 0% 0%, color-mix(in srgb, var(--primary) 12%, transparent) 0%, transparent 60%),
+      radial-gradient(1000px circle at 100% 0%, color-mix(in srgb, var(--accent) 14%, transparent) 0%, transparent 55%);
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-attachment: fixed;
   }
 }

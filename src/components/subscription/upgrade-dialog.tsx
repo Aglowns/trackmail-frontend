@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Check, Crown, Loader2, Sparkles, Star } from 'lucide-react';
 
 import {
@@ -45,6 +45,7 @@ export interface SubscriptionUpgradeDialogProps {
   defaultOpen?: boolean;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
+  initialPlanName?: string;
 }
 
 export function SubscriptionUpgradeDialog({
@@ -56,6 +57,7 @@ export function SubscriptionUpgradeDialog({
   defaultOpen = false,
   open,
   onOpenChange,
+  initialPlanName,
 }: SubscriptionUpgradeDialogProps) {
   const [internalOpen, setInternalOpen] = useState(defaultOpen);
   const [billingPeriod, setBillingPeriod] = useState<BillingPeriod>('monthly');
@@ -87,6 +89,21 @@ export function SubscriptionUpgradeDialog({
     }
     onOpenChange?.(next);
   };
+
+  useEffect(() => {
+    if (!dialogOpen || selectablePlans.length === 0) return;
+
+    if (initialPlanName) {
+      const preferred = selectablePlans.find((plan) => plan.name === initialPlanName);
+      if (preferred) {
+        setSelectedPlanId(preferred.id);
+        return;
+      }
+    }
+
+    const fallback = selectablePlans.find((plan) => plan.name !== currentPlanName) ?? selectablePlans[0];
+    setSelectedPlanId(fallback?.id ?? null);
+  }, [dialogOpen, initialPlanName, selectablePlans, currentPlanName]);
 
   const handleUpgrade = async () => {
     if (!selectedPlan || !onUpgrade) return;

@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { Loader2, Copy, Check, Info, Eye, EyeOff } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -12,6 +13,8 @@ import {
   UserProfile,
   UpdateUserProfileRequest,
 } from '@/types/application';
+import type { SubscriptionStatusResponse } from '@/types/subscription';
+import { SubscriptionLimitIndicator } from '@/components/subscription';
 import {
   Card,
   CardContent,
@@ -61,6 +64,7 @@ const cardOverlayStyles =
   'pointer-events-none absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100';
 
 export default function SettingsPage() {
+  const router = useRouter();
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -70,6 +74,8 @@ export default function SettingsPage() {
   const [tokenCopied, setTokenCopied] = useState(false);
   const [showToken, setShowToken] = useState(false);
   const [generatingKey, setGeneratingKey] = useState(false);
+  const [subscriptionStatus, setSubscriptionStatus] = useState<SubscriptionStatusResponse | null>(null);
+  const [loadingSubscription, setLoadingSubscription] = useState(true);
 
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileSchema),
@@ -116,6 +122,22 @@ export default function SettingsPage() {
 
     void load();
   }, [form]);
+
+  useEffect(() => {
+    async function loadSubscription() {
+      try {
+        setLoadingSubscription(true);
+        const statusData = await apiClient.getSubscriptionStatus();
+        setSubscriptionStatus(statusData);
+      } catch (error) {
+        console.error('Failed to load subscription status', error);
+      } finally {
+        setLoadingSubscription(false);
+      }
+    }
+
+    void loadSubscription();
+  }, []);
 
   async function onSubmit(values: ProfileFormValues) {
     try {
@@ -199,6 +221,16 @@ export default function SettingsPage() {
           Manage your profile information, preferences, and notifications
         </p>
       </div>
+
+      <SubscriptionLimitIndicator
+        planName={subscriptionStatus?.subscription.plan_name ?? 'Free'}
+        applicationsCount={subscriptionStatus?.usage.applications_count ?? 0}
+        applicationsLimit={subscriptionStatus?.usage.applications_limit}
+        features={subscriptionStatus?.features}
+        isLoading={loadingSubscription}
+        onUpgradeClick={() => router.push('/subscription')}
+        showUpgradeCta
+      />
 
       {loading ? (
         <Card className={cardStyles}>

@@ -14,6 +14,7 @@ const navItems = [
   { label: 'Dashboard', href: '/dashboard' },
   { label: 'Applications', href: '/applications' },
   { label: 'Analytics', href: '/analytics' },
+  { label: 'Subscription', href: '/subscription' },
   { label: 'Settings', href: '/settings' },
 ];
 

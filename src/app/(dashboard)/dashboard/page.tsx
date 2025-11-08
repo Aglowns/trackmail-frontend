@@ -1,14 +1,17 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { Loader2, Plus } from 'lucide-react';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
 
 import { apiClient } from '@/lib/api';
 import { Application, ApplicationStatus } from '@/types/application';
+import type { SubscriptionStatusResponse } from '@/types/subscription';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { SubscriptionLimitIndicator } from '@/components/subscription';
 
 const COLUMN_CONFIG: Array<{
   statuses: ApplicationStatus[];
@@ -58,8 +61,11 @@ function confidenceBadge(confidence?: string) {
 }
 
 export default function DashboardPage() {
+  const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [columns, setColumns] = useState<Record<string, Application[]>>({});
+  const [subscription, setSubscription] = useState<SubscriptionStatusResponse | null>(null);
+  const [loadingSubscription, setLoadingSubscription] = useState(true);
 
   useEffect(() => {
     async function fetchData() {
@@ -76,6 +82,22 @@ export default function DashboardPage() {
     }
 
     fetchData();
+  }, []);
+
+  useEffect(() => {
+    async function fetchSubscription() {
+      try {
+        setLoadingSubscription(true);
+        const status = await apiClient.getSubscriptionStatus();
+        setSubscription(status);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setLoadingSubscription(false);
+      }
+    }
+
+    void fetchSubscription();
   }, []);
 
   const columnCards = useMemo(() => {
@@ -99,6 +121,17 @@ export default function DashboardPage() {
           </Link>
         </Button>
       </div>
+
+      <SubscriptionLimitIndicator
+        variant="compact"
+        planName={subscription?.subscription.plan_name ?? 'Free'}
+        applicationsCount={subscription?.usage.applications_count ?? 0}
+        applicationsLimit={subscription?.usage.applications_limit}
+        features={subscription?.features}
+        isLoading={loadingSubscription}
+        onUpgradeClick={() => router.push('/subscription')}
+        showUpgradeCta
+      />
 
       {loading ? (
         <div className="flex min-h-[200px] items-center justify-center rounded-2xl border border-dashed border-border bg-card">

@@ -15,6 +15,11 @@ import {
   UserProfile,
   UpdateUserProfileRequest,
 } from '@/types/application';
+import type {
+  SubscriptionPlan,
+  SubscriptionStatusResponse,
+  CheckoutSessionResponse,
+} from '@/types/subscription';
 
 class ApiClient {
   private client;
@@ -247,6 +252,38 @@ class ApiClient {
       '/v1/installation-token'
     );
     return response.data.installation_token;
+  }
+
+  // Subscription endpoints
+  async getSubscriptionStatus(): Promise<SubscriptionStatusResponse> {
+    const response: AxiosResponse<SubscriptionStatusResponse> = await this.client.get(
+      '/v1/subscription/status',
+    );
+    return response.data;
+  }
+
+  async getSubscriptionPlans(): Promise<SubscriptionPlan[]> {
+    const response: AxiosResponse<{ plans: SubscriptionPlan[] }> = await this.client.get(
+      '/v1/subscription/plans',
+    );
+    return response.data.plans ?? [];
+  }
+
+  async createSubscriptionCheckout(
+    planName: string,
+    billingPeriod: 'monthly' | 'yearly' = 'monthly',
+  ): Promise<CheckoutSessionResponse> {
+    const response: AxiosResponse<CheckoutSessionResponse> = await this.client.post(
+      '/v1/subscription/upgrade',
+      null,
+      {
+        params: {
+          plan_name: planName,
+          billing_period: billingPeriod,
+        },
+      },
+    );
+    return response.data;
   }
 
   // API Key endpoints for Gmail add-on integration

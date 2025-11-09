@@ -96,7 +96,7 @@ const pricingPlans: Array<{
   {
     name: 'Pro',
     badge: 'Most Popular',
-    price: { monthly: 12, annual: 120 },
+    price: { monthly: 2.99, annual: 29.99 },
     description: 'Automation and insights for serious job seekers and career switchers.',
     perks: [
       'Unlimited applications',

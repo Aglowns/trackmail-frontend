@@ -86,21 +86,23 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <div className="flex min-h-screen">
-        <aside className="hidden w-64 flex-col border-r border-border/60 bg-card/90 shadow-lg md:flex">
-          <div className="flex h-full flex-col gap-6 p-6">
-            <Link
-              href="/dashboard"
-              className="flex items-center gap-2 text-xl font-semibold tracking-tight text-primary"
-            >
-              <span className="flex h-9 w-9 items-center justify-center rounded-full bg-primary/10 text-base font-semibold text-primary">
-                JM
-              </span>
-              <span className="font-semibold text-foreground">
-                Job<span className="text-primary">Mail</span>
-              </span>
-            </Link>
+        <aside className="hidden h-screen w-64 flex-col border-r border-border/60 bg-card/90 shadow-lg md:flex">
+          <div className="flex h-full flex-col">
+            <div className="px-6 pb-2 pt-6">
+              <Link
+                href="/dashboard"
+                className="flex items-center gap-2 text-xl font-semibold tracking-tight text-primary"
+              >
+                <span className="flex h-9 w-9 items-center justify-center rounded-full bg-primary/10 text-base font-semibold text-primary">
+                  JM
+                </span>
+                <span className="font-semibold text-foreground">
+                  Job<span className="text-primary">Mail</span>
+                </span>
+              </Link>
+            </div>
 
-            <nav className="flex-1 space-y-1 text-sm font-medium">
+            <nav className="mt-6 flex-1 overflow-y-auto px-6 pb-6 text-sm font-medium">
               {navItems.map(({ label, href, icon: Icon }) => {
                 const isActive =
                   pathname === href || (href !== '/dashboard' && pathname?.startsWith(href));
@@ -122,8 +124,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               })}
             </nav>
 
-            <div className="space-y-4 text-sm">
-              <div className="rounded-lg border border-border/60 bg-card p-3">
+            <div className="space-y-4 border-t border-border/60 bg-card/75 px-6 pb-6 pt-5 text-sm backdrop-blur">
+              <div className="rounded-lg border border-border/60 bg-background/90 p-3">
                 <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                   Account
                 </p>
@@ -135,7 +137,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 </p>
               </div>
 
-              <div className="flex items-center justify-between rounded-lg border border-border/60 bg-card px-3 py-2">
+              <div className="flex items-center justify-between rounded-lg border border-border/60 bg-background/90 px-3 py-2">
                 <span className="text-sm text-muted-foreground">Theme</span>
                 <ThemeToggle />
               </div>

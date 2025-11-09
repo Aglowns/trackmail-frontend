@@ -66,6 +66,7 @@ export default function DashboardPage() {
   const [columns, setColumns] = useState<Record<string, Application[]>>({});
   const [subscription, setSubscription] = useState<SubscriptionStatusResponse | null>(null);
   const [loadingSubscription, setLoadingSubscription] = useState(true);
+  const [expandedColumns, setExpandedColumns] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     async function fetchData() {
@@ -125,6 +126,15 @@ export default function DashboardPage() {
     (columns.offer?.length ?? 0) + (columns.offer_received?.length ?? 0) + (columns.accepted?.length ?? 0);
 
   const rejectedCount = columns.rejected?.length ?? 0;
+
+  const toggleColumn = (title: string) => {
+    setExpandedColumns((prev) => ({
+      ...prev,
+      [title]: !prev[title],
+    }));
+  };
+
+  const VISIBLE_LIMIT = 6;
 
   return (
     <div className="space-y-6">
@@ -187,77 +197,93 @@ export default function DashboardPage() {
       ) : (
         <div className="-mx-4 overflow-x-auto pb-4 sm:mx-0">
           <div className="flex min-w-[720px] gap-4 px-4 sm:min-w-0 sm:grid sm:grid-cols-2 sm:px-0 xl:grid-cols-5">
-            {columnCards.map(({ title, indicator, applications }) => (
+            {columnCards.map(({ title, indicator, applications }) => {
+              const isExpanded = Boolean(expandedColumns[title]);
+              const visibleApplications = isExpanded ? applications : applications.slice(0, VISIBLE_LIMIT);
+              const hasMore = applications.length > VISIBLE_LIMIT;
+
+              return (
               <Card
-                key={title}
-                className="group relative overflow-hidden border border-border/60 bg-card/80 shadow-lg shadow-primary/5 transition duration-300 hover:-translate-y-1 hover:shadow-primary/20"
-              >
-                <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
-                <CardHeader className="relative flex flex-col space-y-1 pb-3">
-                  <CardTitle className="flex items-center justify-between text-base font-semibold">
-                    <span>{title}</span>
-                    <span className={`flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold ${indicator}`}>
-                      {applications.length}
-                    </span>
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="relative space-y-4">
-                  {applications.length === 0 ? (
-                    <div className="rounded-xl border border-dashed border-border bg-muted/40 py-8 text-center text-sm text-muted-foreground">
-                      No applications yet
-                    </div>
-                  ) : (
-                    applications.map((application) => (
-                      <article
-                        key={application.id}
-                        className="space-y-3 rounded-xl border border-border bg-card p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-md"
-                      >
-                        <div className="flex items-center justify-between gap-3">
-                          <div className="flex items-center gap-2 min-w-0 flex-1">
-                            <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-muted text-xs font-semibold text-muted-foreground">
-                              {application.company?.charAt(0).toUpperCase() ?? '?'}
+                  key={title}
+                  className="group relative overflow-hidden border border-border/60 bg-card/80 shadow-lg shadow-primary/5 transition duration-300 hover:-translate-y-1 hover:shadow-primary/20"
+                >
+                  <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+                  <CardHeader className="relative flex flex-col space-y-1 pb-3">
+                    <CardTitle className="flex items-center justify-between text-base font-semibold">
+                      <span>{title}</span>
+                      <span className={`flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold ${indicator}`}>
+                        {applications.length}
+                      </span>
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="relative space-y-4">
+                    {visibleApplications.length === 0 ? (
+                      <div className="rounded-xl border border-dashed border-border bg-muted/40 py-8 text-center text-sm text-muted-foreground">
+                        No applications yet
+                      </div>
+                    ) : (
+                      visibleApplications.map((application) => (
+                        <article
+                          key={application.id}
+                          className="space-y-3 rounded-xl border border-border bg-card p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-md"
+                        >
+                          <div className="flex items-center justify-between gap-3">
+                            <div className="flex min-w-0 flex-1 items-center gap-2">
+                              <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-muted text-xs font-semibold text-muted-foreground">
+                                {application.company?.charAt(0).toUpperCase() ?? '?'}
+                              </div>
+                              <div className="min-w-0 flex-1">
+                                <p className="truncate text-sm font-semibold">
+                                  {application.position}
+                                </p>
+                                <p className="truncate text-xs text-muted-foreground">{application.company}</p>
+                              </div>
                             </div>
-                            <div className="min-w-0 flex-1">
-                              <p className="truncate text-sm font-semibold">
-                                {application.position}
-                              </p>
-                              <p className="truncate text-xs text-muted-foreground">{application.company}</p>
-                            </div>
+                            {confidenceBadge(application.confidence)}
                           </div>
-                          {confidenceBadge(application.confidence)}
-                        </div>
 
-                        <div className="flex flex-wrap gap-2 text-xs text-muted-foreground">
-                          {application.location && (
-                            <span className="rounded-full bg-muted/60 px-2 py-1">{application.location}</span>
-                          )}
-                          <span className="rounded-full bg-primary/10 px-2 py-1 text-primary">
-                            {statusLabel(application.status)}
-                          </span>
-                          {application.applied_at && (
-                            <span className="rounded-full bg-muted/60 px-2 py-1">
-                              {new Date(application.applied_at).toLocaleDateString()}
+                          <div className="flex flex-wrap gap-2 text-xs text-muted-foreground">
+                            {application.location && (
+                              <span className="rounded-full bg-muted/60 px-2 py-1">{application.location}</span>
+                            )}
+                            <span className="rounded-full bg-primary/10 px-2 py-1 text-primary">
+                              {statusLabel(application.status)}
                             </span>
-                          )}
-                        </div>
+                            {application.applied_at && (
+                              <span className="rounded-full bg-muted/60 px-2 py-1">
+                                {new Date(application.applied_at).toLocaleDateString()}
+                              </span>
+                            )}
+                          </div>
 
-                        <div className="flex items-center justify-between border-t border-border pt-3 text-xs text-muted-foreground">
-                          <span className="truncate">
-                            {application.source ?? 'Unknown source'}
-                          </span>
-                          <Link
-                            href={`/applications/${application.id}`}
-                            className="whitespace-nowrap font-medium text-primary hover:text-primary/80"
-                          >
-                            View Timeline
-                          </Link>
-                        </div>
-                      </article>
-                    ))
-                  )}
-                </CardContent>
-              </Card>
-            ))}
+                          <div className="flex items-center justify-between border-t border-border pt-3 text-xs text-muted-foreground">
+                            <span className="truncate">
+                              {application.source ?? 'Unknown source'}
+                            </span>
+                            <Link
+                              href={`/applications/${application.id}`}
+                              className="whitespace-nowrap font-medium text-primary hover:text-primary/80"
+                            >
+                              View Timeline
+                            </Link>
+                          </div>
+                        </article>
+                      ))
+                    )}
+
+                    {hasMore && (
+                      <button
+                        type="button"
+                        onClick={() => toggleColumn(title)}
+                        className="flex w-full items-center justify-center rounded-lg border border-primary/30 bg-primary/5 px-3 py-2 text-sm font-medium text-primary transition hover:bg-primary/10"
+                      >
+                        {isExpanded ? 'Show less' : `Show all ${applications.length} ${title.toLowerCase()}`}
+                      </button>
+                    )}
+                  </CardContent>
+                </Card>
+              );
+            })}
           </div>
         </div>
       )}

@@ -216,69 +216,75 @@ export default function DashboardPage() {
                       </span>
                     </CardTitle>
                   </CardHeader>
-                  <CardContent className="relative space-y-4">
-                    {visibleApplications.length === 0 ? (
-                      <div className="rounded-xl border border-dashed border-border bg-muted/40 py-8 text-center text-sm text-muted-foreground">
-                        No applications yet
-                      </div>
-                    ) : (
-                      visibleApplications.map((application) => (
-                        <article
-                          key={application.id}
-                          className="space-y-3 rounded-xl border border-border bg-card p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-md"
-                        >
-                          <div className="flex items-center justify-between gap-3">
-                            <div className="flex min-w-0 flex-1 items-center gap-2">
-                              <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-muted text-xs font-semibold text-muted-foreground">
-                                {application.company?.charAt(0).toUpperCase() ?? '?'}
-                              </div>
-                              <div className="min-w-0 flex-1">
-                                <p className="truncate text-sm font-semibold">
+                  <CardContent className="relative space-y-3">
+                    <div className="max-h-[520px] space-y-3 overflow-y-auto pr-1">
+                      {visibleApplications.length === 0 ? (
+                        <div className="rounded-xl border border-dashed border-border bg-muted/40 py-8 text-center text-sm text-muted-foreground">
+                          No applications yet
+                        </div>
+                      ) : (
+                        visibleApplications.map((application) => (
+                          <article
+                            key={application.id}
+                            className="space-y-3 rounded-xl border border-border bg-card/90 p-3 shadow-sm transition hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-md"
+                          >
+                            <div className="flex items-start justify-between gap-2">
+                              <div className="min-w-0 flex-1 space-y-1">
+                                <p className="truncate text-[13px] font-semibold text-foreground">
                                   {application.position}
                                 </p>
-                                <p className="truncate text-xs text-muted-foreground">{application.company}</p>
+                                <p className="truncate text-[12px] text-muted-foreground">
+                                  {application.company ?? 'Unknown company'}
+                                </p>
                               </div>
+                              {confidenceBadge(application.confidence)}
                             </div>
-                            {confidenceBadge(application.confidence)}
-                          </div>
 
-                          <div className="flex flex-wrap gap-2 text-xs text-muted-foreground">
-                            {application.location && (
-                              <span className="rounded-full bg-muted/60 px-2 py-1">{application.location}</span>
-                            )}
-                            <span className="rounded-full bg-primary/10 px-2 py-1 text-primary">
-                              {statusLabel(application.status)}
-                            </span>
-                            {application.applied_at && (
-                              <span className="rounded-full bg-muted/60 px-2 py-1">
-                                {new Date(application.applied_at).toLocaleDateString()}
+                            <div className="flex flex-wrap items-center gap-2 text-[11px] text-muted-foreground">
+                              <span className="rounded-full bg-primary/10 px-2 py-0.5 text-primary">
+                                {statusLabel(application.status)}
                               </span>
-                            )}
-                          </div>
+                              {application.location && (
+                                <span className="rounded-full bg-muted/60 px-2 py-0.5">{application.location}</span>
+                              )}
+                              {application.applied_at && (
+                                <span className="rounded-full bg-muted/60 px-2 py-0.5">
+                                  {new Date(application.applied_at).toLocaleDateString()}
+                                </span>
+                              )}
+                              {application.source && (
+                                <span className="truncate text-muted-foreground/80">
+                                  {application.source}
+                                </span>
+                              )}
+                            </div>
 
-                          <div className="flex items-center justify-between border-t border-border pt-3 text-xs text-muted-foreground">
-                            <span className="truncate">
-                              {application.source ?? 'Unknown source'}
-                            </span>
-                            <Link
-                              href={`/applications/${application.id}`}
-                              className="whitespace-nowrap font-medium text-primary hover:text-primary/80"
-                            >
-                              View Timeline
-                            </Link>
-                          </div>
-                        </article>
-                      ))
-                    )}
+                            <div className="flex items-center justify-between border-t border-border pt-2 text-[11px] text-muted-foreground">
+                              <span className="truncate">
+                                {application.notes ? application.notes.slice(0, 38) : 'No notes yet'}
+                              </span>
+                              <Link
+                                href={`/applications/${application.id}`}
+                                className="whitespace-nowrap text-primary transition hover:text-primary/80"
+                              >
+                                View
+                              </Link>
+                            </div>
+                          </article>
+                        ))
+                      )}
+                    </div>
 
                     {hasMore && (
-                      <button
-                        type="button"
-                        onClick={() => toggleColumn(title)}
-                        className="flex w-full items-center justify-center rounded-lg border border-primary/30 bg-primary/5 px-3 py-2 text-sm font-medium text-primary transition hover:bg-primary/10"
-                      >
-                        {isExpanded ? 'Show less' : `Show all ${applications.length} ${title.toLowerCase()}`}
-                      </button>
+                      <div className="sticky bottom-0 rounded-lg bg-gradient-to-b from-transparent via-card/70 to-card pt-2">
+                        <button
+                          type="button"
+                          onClick={() => toggleColumn(title)}
+                          className="flex w-full items-center justify-center rounded-lg border border-primary/30 bg-primary/5 px-3 py-2 text-sm font-medium text-primary transition hover:bg-primary/10"
+                        >
+                          {isExpanded ? 'Show less' : `Show all ${applications.length} ${title.toLowerCase()}`}
+                        </button>
+                      </div>
                     )}
                   </CardContent>
                 </Card>

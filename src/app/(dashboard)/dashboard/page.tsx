@@ -217,70 +217,68 @@ export default function DashboardPage() {
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="relative space-y-3">
-                    <div className="max-h-[520px] space-y-3 overflow-y-auto pr-1">
-                      {visibleApplications.length === 0 ? (
-                        <div className="rounded-xl border border-dashed border-border bg-muted/40 py-8 text-center text-sm text-muted-foreground">
-                          No applications yet
-                        </div>
-                      ) : (
-                        visibleApplications.map((application) => (
-                          <article
-                            key={application.id}
-                            className="space-y-3 rounded-xl border border-border bg-card/90 p-3 shadow-sm transition hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-md"
-                          >
-                            <div className="flex items-start justify-between gap-2">
-                              <div className="min-w-0 flex-1 space-y-1">
-                                <p className="truncate text-[13px] font-semibold text-foreground">
-                                  {application.position}
-                                </p>
-                                <p className="truncate text-[12px] text-muted-foreground">
-                                  {application.company ?? 'Unknown company'}
-                                </p>
-                              </div>
-                              {confidenceBadge(application.confidence)}
+                    {visibleApplications.length === 0 ? (
+                      <div className="rounded-xl border border-dashed border-border bg-muted/40 py-8 text-center text-sm text-muted-foreground">
+                        No applications yet
+                      </div>
+                    ) : (
+                      visibleApplications.map((application) => (
+                        <article
+                          key={application.id}
+                          className="space-y-3 rounded-xl border border-border bg-card/90 p-3 shadow-sm transition hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-md"
+                        >
+                          <div className="flex items-start justify-between gap-2">
+                            <div className="min-w-0 flex-1 space-y-1">
+                              <p className="truncate text-[13px] font-semibold text-foreground">
+                                {application.position}
+                              </p>
+                              <p className="truncate text-[12px] text-muted-foreground">
+                                {application.company ?? 'Unknown company'}
+                              </p>
                             </div>
+                            {confidenceBadge(application.confidence)}
+                          </div>
 
-                            <div className="flex flex-wrap items-center gap-2 text-[11px] text-muted-foreground">
-                              <span className="rounded-full bg-primary/10 px-2 py-0.5 text-primary">
-                                {statusLabel(application.status)}
+                          <div className="flex flex-wrap items-center gap-2 text-[11px] text-muted-foreground">
+                            <span className="rounded-full bg-primary/10 px-2 py-0.5 text-primary">
+                              {statusLabel(application.status)}
+                            </span>
+                            {application.location && (
+                              <span className="rounded-full bg-muted/60 px-2 py-0.5">{application.location}</span>
+                            )}
+                            {application.applied_at && (
+                              <span className="rounded-full bg-muted/60 px-2 py-0.5">
+                                {new Date(application.applied_at).toLocaleDateString()}
                               </span>
-                              {application.location && (
-                                <span className="rounded-full bg-muted/60 px-2 py-0.5">{application.location}</span>
-                              )}
-                              {application.applied_at && (
-                                <span className="rounded-full bg-muted/60 px-2 py-0.5">
-                                  {new Date(application.applied_at).toLocaleDateString()}
-                                </span>
-                              )}
-                              {application.source && (
-                                <span className="truncate text-muted-foreground/80">
-                                  {application.source}
-                                </span>
-                              )}
-                            </div>
+                            )}
+                            {application.source && (
+                              <span className="truncate text-muted-foreground/80">
+                                {application.source}
+                              </span>
+                            )}
+                          </div>
 
-                            <div className="flex items-center justify-between border-t border-border pt-2 text-[11px] text-muted-foreground">
-                              <span className="truncate">
-                                {application.notes ? application.notes.slice(0, 38) : 'No notes yet'}
-                              </span>
-                              <Link
-                                href={`/applications/${application.id}`}
-                                className="whitespace-nowrap text-primary transition hover:text-primary/80"
-                              >
-                                View
-                              </Link>
-                            </div>
-                          </article>
-                        ))
-                      )}
-                    </div>
+                          <div className="flex items-center justify-between border-t border-border pt-2 text-[11px] text-muted-foreground">
+                            <span className="truncate">
+                              {application.notes ? application.notes.slice(0, 38) : 'No notes yet'}
+                            </span>
+                            <Link
+                              href={`/applications/${application.id}`}
+                              className="whitespace-nowrap text-primary transition hover:text-primary/80"
+                            >
+                              View
+                            </Link>
+                          </div>
+                        </article>
+                      ))
+                    )}
 
                     {hasMore && (
-                      <div className="sticky bottom-0 rounded-lg bg-gradient-to-b from-transparent via-card/70 to-card pt-2">
+                      <div className="rounded-lg bg-primary/5 px-3 py-2">
                         <button
                           type="button"
                           onClick={() => toggleColumn(title)}
-                          className="flex w-full items-center justify-center rounded-lg border border-primary/30 bg-primary/5 px-3 py-2 text-sm font-medium text-primary transition hover:bg-primary/10"
+                          className="flex w-full items-center justify-center text-sm font-medium text-primary transition hover:text-primary/80"
                         >
                           {isExpanded ? 'Show less' : `Show all ${applications.length} ${title.toLowerCase()}`}
                         </button>

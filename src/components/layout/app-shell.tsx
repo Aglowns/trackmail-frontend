@@ -85,8 +85,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <div className="flex min-h-screen">
-        <aside className="hidden h-screen w-64 flex-col border-r border-border/60 bg-card/90 shadow-lg md:flex">
+      <div className="flex min-h-screen md:pl-64">
+        <aside className="fixed inset-y-0 left-0 z-40 hidden w-64 flex-col border-r border-border/60 bg-card/90 shadow-lg md:flex">
           <div className="flex h-full flex-col">
             <div className="px-6 pb-2 pt-6">
               <Link

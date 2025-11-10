@@ -75,6 +75,7 @@ class ApiClient {
     if (filters?.search) params.append('search', filters.search);
     if (filters?.date_from) params.append('date_from', filters.date_from);
     if (filters?.date_to) params.append('date_to', filters.date_to);
+    if (filters?.sort) params.append('sort', filters.sort);
     params.append('skip', ((page - 1) * limit).toString());  // Backend uses skip/limit, not page/limit!
     params.append('limit', limit.toString());
 
@@ -201,6 +202,7 @@ class ApiClient {
     if (filters?.date_from) params.append('date_from', filters.date_from);
     if (filters?.date_to) params.append('date_to', filters.date_to);
     if (filters?.search) params.append('search', filters.search);
+    if (filters?.sort) params.append('sort', filters.sort);
 
     const response = await this.client.get(`/v1/applications/export?${params.toString()}`, {
       responseType: 'blob',

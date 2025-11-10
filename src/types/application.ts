@@ -66,6 +66,7 @@ export interface ApplicationFilters {
   search?: string;
   date_from?: string;
   date_to?: string;
+  sort?: 'updated_desc' | 'applied_desc';
 }
 
 export interface PaginatedApplications {

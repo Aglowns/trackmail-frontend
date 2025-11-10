@@ -37,12 +37,15 @@ const statusOptions: { value: ApplicationStatus | 'all'; label: string }[] = [
 ];
 
 const sources = ['All Sources', 'LinkedIn', 'Company', 'Indeed', 'Referral', 'Glassdoor'];
-const dateRanges = ['Date Applied', 'Last Updated'];
+const sortOptions = [
+  { value: 'updated_desc' as const, label: 'Last Updated' },
+  { value: 'applied_desc' as const, label: 'Date Applied' },
+];
 
 function ApplicationsContent() {
   const searchParams = useSearchParams();
   const [loading, setLoading] = useState(false);
-  const [filters, setFilters] = useState<ApplicationFilters>({ status: 'all' });
+  const [filters, setFilters] = useState<ApplicationFilters>({ status: 'all', sort: 'updated_desc' });
   const [applications, setApplications] = useState<Application[]>([]);
 
   // Read search query from URL
@@ -92,6 +95,8 @@ function ApplicationsContent() {
       toast.error('Failed to export applications');
     }
   }
+
+  const dateColumnLabel = (filters.sort ?? 'updated_desc') === 'applied_desc' ? 'Date Applied' : 'Last Updated';
 
   return (
     <div className="space-y-6">
@@ -155,25 +160,23 @@ function ApplicationsContent() {
             </Select>
 
             <Select
-              value={filters.date_from ? 'Custom Range' : 'Date Applied'}
+              value={filters.sort ?? 'updated_desc'}
               onValueChange={(value) =>
                 setFilters((prev) => ({
                   ...prev,
-                  date_from: value === 'Date Applied' ? undefined : prev.date_from,
-                  date_to: value === 'Date Applied' ? undefined : prev.date_to,
+                  sort: value as 'updated_desc' | 'applied_desc',
                 }))
               }
             >
               <SelectTrigger className="h-11 rounded-xl text-sm">
-                <SelectValue placeholder="Date Applied" />
+                <SelectValue placeholder="Sort by" />
               </SelectTrigger>
               <SelectContent>
-                {dateRanges.map((range) => (
-                  <SelectItem key={range} value={range}>
-                    {range}
+                {sortOptions.map((option) => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
                   </SelectItem>
                 ))}
-                <SelectItem value="Custom Range">Custom Range</SelectItem>
               </SelectContent>
             </Select>
 
@@ -201,7 +204,7 @@ function ApplicationsContent() {
                   <TableHead>Position</TableHead>
                   <TableHead>Location</TableHead>
                   <TableHead>Status</TableHead>
-                  <TableHead>Date Applied</TableHead>
+                  <TableHead>{dateColumnLabel}</TableHead>
                   <TableHead>Confidence</TableHead>
                   <TableHead>Source</TableHead>
                   <TableHead className="w-16 text-right">Actions</TableHead>
@@ -223,8 +226,16 @@ function ApplicationsContent() {
                     </TableCell>
                   </TableRow>
                 ) : (
-                  applications.map((application) => (
-                    <TableRow key={application.id} className="hover:bg-muted/50">
+                  applications.map((application) => {
+                    const sortMode = filters.sort ?? 'updated_desc';
+                    const dateSource =
+                      sortMode === 'applied_desc'
+                        ? application.applied_at ?? application.created_at
+                        : application.updated_at ?? application.applied_at ?? application.created_at;
+                    const formattedDate = dateSource ? new Date(dateSource).toLocaleDateString() : '—';
+
+                    return (
+                      <TableRow key={application.id} className="hover:bg-muted/50">
                       <TableCell>
                         <input type="checkbox" className="h-4 w-4 rounded border-border" />
                       </TableCell>
@@ -243,11 +254,7 @@ function ApplicationsContent() {
                           {application.status.replace('_', ' ')}
                         </span>
                       </TableCell>
-                      <TableCell>
-                        {application.applied_at
-                          ? new Date(application.applied_at).toLocaleDateString()
-                          : '—'}
-                      </TableCell>
+                      <TableCell>{formattedDate}</TableCell>
                       <TableCell>
                         <span className="text-sm text-muted-foreground">{application.confidence ?? '—'}</span>
                       </TableCell>
@@ -273,8 +280,9 @@ function ApplicationsContent() {
                           View
                         </Link>
                       </TableCell>
-                    </TableRow>
-                  ))
+                      </TableRow>
+                    );
+                  })
                 )}
               </TableBody>
             </Table>

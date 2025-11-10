@@ -29,27 +29,27 @@ const features: Array<{
   icon: LucideIcon;
 }> = [
   {
-    title: 'Auto-ingest from Gmail',
+    title: 'Gmail Auto-Tracking',
     description:
-      'Automatically detect job application emails, capture attachments, and extract key details without lifting a finger.',
+      'JobMail watches your inbox for application updates, rejections, and offers—then syncs them to your board automatically.',
     icon: Mail,
   },
   {
-    title: 'Smart Parsing',
+    title: 'AI-Powered Parsing',
     description:
-      'Extract company, role, location, and dates from any email format using our ultra-accurate parsing engine.',
+      'Understand any format. We pull out company, role, dates, and links even when recruiters bury them in long paragraphs.',
     icon: Sparkles,
   },
   {
-    title: 'Kanban + List Views',
+    title: 'Kanban & Table Views',
     description:
-      'Organize applications with drag-and-drop kanban boards or detailed list views tailored to your workflow.',
+      'Toggle between a drag-and-drop pipeline and a sortable table to work the way you prefer—solo or with a coach.',
     icon: KanbanSquare,
   },
   {
-    title: 'Analytics & Timelines',
+    title: 'Reminders & Insights',
     description:
-      'Track interviews, offers, and response times with powerful analytics and email-linked timelines.',
+      'Stay ahead with response-time analytics, follow-up nudges, and a timeline that connects every email to your next step.',
     icon: BarChart3,
   },
 ];
@@ -59,19 +59,19 @@ const howItWorks = [
     step: 1,
     title: 'Connect Gmail',
     description:
-      'Securely sign in with Google and grant read-only access in under a minute. No forwarding rules required.',
+      'One-click Google authentication with read-only scopes. No forwarding rules, labels, or manual setup required.',
   },
   {
     step: 2,
-    title: 'We detect emails',
+    title: 'We track every update',
     description:
-      'Our AI scans your inbox for job-related emails, parses critical information, and creates clean application records.',
+      'New applications, rejections, interview invites—we detect them all and capture the important details instantly.',
   },
   {
     step: 3,
-    title: 'Dashboard updates',
+    title: 'Take action in the dashboard',
     description:
-      'Review your kanban board or detailed lists, trigger reminders, and keep every opportunity organized automatically.',
+      'Review your pipeline, change statuses, add notes, and follow up using reminders tied to the emails we ingested.',
   },
 ];
 
@@ -88,38 +88,25 @@ const pricingPlans: Array<{
   {
     name: 'Free',
     price: { monthly: 0, annual: 0 },
-    description: 'Perfect for kickstarting your search without manual spreadsheets.',
-    perks: ['Up to 50 applications', 'Basic email parsing', 'Kanban board'],
-    ctaLabel: 'Get Started',
+    description: 'Kickstart your search with a lightweight tracker that beats spreadsheets every time.',
+    perks: ['Up to 50 tracked applications', 'Basic email parsing', 'Kanban + table view'],
+    ctaLabel: 'Create free account',
     ctaHref: '/signup',
   },
   {
     name: 'Pro',
     badge: 'Most Popular',
     price: { monthly: 2.99, annual: 29.99 },
-    description: 'Automation and insights for serious job seekers and career switchers.',
+    description: 'Unlock auto-tracking, reminders, and analytics so you never miss a recruiter response.',
     perks: [
-      'Unlimited applications',
-      'Advanced AI parsing',
-      'Analytics & insights',
-      'Email reminders',
+      'Unlimited applications & storage',
+      'Full AI parsing + attachment capture',
+      'Auto-tracking + follow-up reminders',
+      'Analytics dashboard & CSV export',
     ],
-    ctaLabel: 'Start Free Trial',
+    ctaLabel: 'Start 14-day trial',
     ctaHref: '/signup',
     highlight: true,
-  },
-  {
-    name: 'Team',
-    price: { monthly: 29, annual: 288 },
-    description: 'Manage a coaching business or bootcamp cohort with collaborative tools.',
-    perks: [
-      'Everything in Pro',
-      'Team collaboration',
-      'Shared templates',
-      'Priority support',
-    ],
-    ctaLabel: 'Contact Sales',
-    ctaHref: 'mailto:hello@trackmail.app',
   },
 ];
 
@@ -129,23 +116,23 @@ const securityFeatures: Array<{
   icon: LucideIcon;
 }> = [
   {
-    title: 'Supabase RLS',
-    description: 'Row-level security keeps each candidate’s data fully isolated and encrypted.',
+    title: 'Row-Level Security',
+    description: 'Supabase RLS keeps every candidate profile isolated—no shared tables, no shared data.',
     icon: ShieldCheck,
   },
   {
-    title: 'Minimal Permissions',
-    description: 'Read-only Gmail scopes ensure JobMail never sends emails on your behalf.',
+    title: 'Read-Only Gmail Access',
+    description: 'We request only Gmail read scopes, so JobMail can’t send or delete emails on your behalf.',
     icon: LockKeyhole,
   },
   {
-    title: 'User Control',
-    description: 'Adjust data retention and privacy settings at any time from the dashboard.',
+    title: 'Transparent Controls',
+    description: 'Download or delete your data whenever you like. Manage retention straight from settings.',
     icon: UserCheck,
   },
   {
-    title: 'Data Retention',
-    description: 'Transparent policies with user-defined retention so your data never lingers longer than needed.',
+    title: 'Encrypted Storage',
+    description: 'All application data and attachments are stored with industry-standard encryption at rest.',
     icon: Database,
   },
 ];
@@ -153,18 +140,18 @@ const securityFeatures: Array<{
 const footerLinks = {
   product: [
     { label: 'Features', href: '#features' },
+    { label: 'How it works', href: '#how-it-works' },
     { label: 'Pricing', href: '#pricing' },
     { label: 'Security', href: '#security' },
-    { label: 'Changelog', href: 'https://github.com/' },
   ],
   resources: [
-    { label: 'Documentation', href: '#docs' },
-    { label: 'API Reference', href: '#docs' },
-    { label: 'Help Center', href: '#docs' },
-    { label: 'Community', href: '#docs' },
+    { label: 'Setup guide', href: '#how-it-works' },
+    { label: 'Support', href: 'mailto:hello@trackmail.app' },
+    { label: 'Status', href: 'https://status.jobmail.app' },
+    { label: 'Changelog', href: 'https://github.com/Aglowns/Jobmail' },
   ],
   company: [
-    { label: 'About', href: '#about' },
+    { label: 'About JobMail', href: '#' },
     { label: 'Privacy Policy', href: '#privacy' },
     { label: 'Terms of Service', href: '#terms' },
     { label: 'Contact', href: 'mailto:hello@trackmail.app' },
@@ -202,14 +189,14 @@ export default function LandingPage() {
             <Link href="#features" className="transition hover:text-foreground">
               Features
             </Link>
+            <Link href="#how-it-works" className="transition hover:text-foreground">
+              How it works
+            </Link>
             <Link href="#pricing" className="transition hover:text-foreground">
               Pricing
             </Link>
             <Link href="#security" className="transition hover:text-foreground">
               Security
-            </Link>
-            <Link href="#docs" className="transition hover:text-foreground">
-              Docs
             </Link>
           </nav>
           <div className="hidden items-center gap-3 md:flex">
@@ -245,9 +232,9 @@ export default function LandingPage() {
             <nav className="flex flex-col gap-3 text-sm font-medium text-muted-foreground">
               {[
                 { label: 'Features', href: '#features' },
+                { label: 'How it works', href: '#how-it-works' },
                 { label: 'Pricing', href: '#pricing' },
                 { label: 'Security', href: '#security' },
-                { label: 'Docs', href: '#docs' },
               ].map((item) => (
                 <Link
                   key={item.href}
@@ -503,10 +490,10 @@ export default function LandingPage() {
         <section id="cta" className="bg-primary">
           <div className="mx-auto flex max-w-5xl flex-col items-center gap-6 px-4 py-20 text-center text-primary-foreground sm:px-6 lg:px-8">
             <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">
-              Ready to track your applications automatically?
+              Stop copying details into spreadsheets every time you apply.
             </h2>
             <p className="text-base text-primary-foreground/90 sm:text-lg">
-              Join thousands of job seekers who never miss an opportunity.
+              JobMail captures the email, fills in the company and role, and reminds you to follow up—automatically.
             </p>
             <div className="flex flex-col gap-4 sm:flex-row">
               <Button asChild size="lg" className="min-w-[180px] bg-background text-foreground hover:bg-background/90">

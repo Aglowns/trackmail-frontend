@@ -40,6 +40,45 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return () => subscription.unsubscribe();
   }, []);
 
+  useEffect(() => {
+    let refreshInFlight = false;
+
+    const refreshSession = async () => {
+      if (refreshInFlight) return;
+      refreshInFlight = true;
+      try {
+        const { data } = await supabase.auth.getSession();
+        if (data.session) {
+          await supabase.auth.refreshSession();
+        }
+      } catch (error) {
+        console.warn('Auth refresh failed', error);
+      } finally {
+        refreshInFlight = false;
+      }
+    };
+
+    const handleFocus = () => {
+      refreshSession();
+    };
+
+    const handleVisibility = () => {
+      if (document.visibilityState === 'visible') {
+        refreshSession();
+      }
+    };
+
+    const interval = window.setInterval(refreshSession, 1000 * 60 * 25); // refresh every 25 minutes
+    window.addEventListener('focus', handleFocus);
+    document.addEventListener('visibilitychange', handleVisibility);
+
+    return () => {
+      window.clearInterval(interval);
+      window.removeEventListener('focus', handleFocus);
+      document.removeEventListener('visibilitychange', handleVisibility);
+    };
+  }, []);
+
   const signIn = async (email: string, password: string) => {
     const { error } = await supabase.auth.signInWithPassword({
       email,

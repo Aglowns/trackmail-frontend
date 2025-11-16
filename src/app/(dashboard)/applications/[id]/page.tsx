@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
-import { Calendar, Clock, Mail, NotebookPen, Plus, ArrowLeft } from 'lucide-react';
+import { Calendar, Clock, Mail, NotebookPen, Plus, ArrowLeft, MailPlus, PhoneCall, PartyPopper } from 'lucide-react';
 
 import { apiClient } from '@/lib/api';
 import { Application, TimelineEvent, ApplicationStatus } from '@/types/application';
@@ -15,6 +15,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { StatusBadge } from '@/components/status-badge';
+import { GmailAddonInstallCard } from '@/components/gmail-addon/install-card';
 
 type TabKey = 'timeline' | 'details' | 'notes' | 'emails';
 
@@ -53,6 +55,7 @@ export default function ApplicationDetailPage() {
   const [loading, setLoading] = useState(true);
   const [eventDialogOpen, setEventDialogOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [updatingStatus, setUpdatingStatus] = useState<ApplicationStatus | null>(null);
   
   const [eventFormData, setEventFormData] = useState({
     event_type: 'note',
@@ -64,6 +67,7 @@ export default function ApplicationDetailPage() {
     async function load() {
       try {
         setLoading(true);
+        // Batch API calls in parallel for faster loading
         const [app, timeline] = await Promise.all([
           apiClient.getApplication(params.id),
           apiClient.getApplicationEvents(params.id),
@@ -81,6 +85,24 @@ export default function ApplicationDetailPage() {
   }, [params.id]);
 
   async function handleAddEvent() {
+  async function handleStatusUpdate(nextStatus: ApplicationStatus) {
+    if (!application) return;
+
+    try {
+      setUpdatingStatus(nextStatus);
+      const updated = await apiClient.updateApplication(application.id, { status: nextStatus });
+      setApplication(updated);
+      toast.success(`Status updated to ${nextStatus.replace('_', ' ')}`);
+    } catch (error) {
+      console.error(error);
+      toast.error('Failed to update status');
+    } finally {
+      setUpdatingStatus(null);
+    }
+  }
+
+  const isGmailSource = application?.source?.toLowerCase().includes('gmail');
+
     if (!eventFormData.event_type || !eventFormData.notes.trim()) {
       toast.error('Please fill in all required fields');
       return;
@@ -122,6 +144,8 @@ export default function ApplicationDetailPage() {
     );
   }
 
+  const isGmailSource = application.source?.toLowerCase().includes('gmail');
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -131,9 +155,17 @@ export default function ApplicationDetailPage() {
               <ArrowLeft className="h-4 w-4" /> Back to applications
             </Link>
           </Button>
-          <div>
+          <div className="space-y-2">
             <h1 className="text-2xl font-semibold">{application.position}</h1>
-            <p className="text-sm text-muted-foreground">{application.company}</p>
+            <p className="flex items-center gap-2 text-sm text-muted-foreground">
+              {application.company}
+              {isGmailSource && (
+                <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-xs font-semibold text-primary">
+                  <MailPlus className="h-3 w-3" />
+                  Tracked via Gmail
+                </span>
+              )}
+            </p>
           </div>
         </div>
         <Button
@@ -162,12 +194,10 @@ export default function ApplicationDetailPage() {
                 </div>
               </div>
               <div className="rounded-xl border border-border/60 bg-muted/40 p-4 text-sm">
-                <p className="flex items-center justify-between text-xs uppercase tracking-wide text-muted-foreground">
-                  Status
-                  <span className="rounded-full bg-primary/10 px-2 py-1 text-[11px] font-semibold text-primary">
-                    {application.status.replace('_', ' ')}
-                  </span>
-                </p>
+                <div className="flex items-center justify-between text-xs uppercase tracking-wide text-muted-foreground">
+                  <span>Status</span>
+                  <StatusBadge status={application.status} className="px-2 py-1 text-[11px]" />
+                </div>
                 <p className="mt-3 flex items-center gap-2 text-xs text-muted-foreground">
                   <Calendar className="h-4 w-4" />
                   Applied {application.applied_at ? new Date(application.applied_at).toLocaleDateString() : '—'}
@@ -184,16 +214,29 @@ export default function ApplicationDetailPage() {
                   Confidence
                   <span className="font-medium text-foreground">{application.confidence ?? 'Not set'}</span>
                 </p>
-                <p className="flex items-center justify-between">
-                  Source
-                  <span className="font-medium text-foreground">{application.source ?? '—'}</span>
-                </p>
+                <div className="flex items-center justify-between gap-3">
+                  <span>Source</span>
+                  {isGmailSource ? (
+                    <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-xs font-semibold text-primary">
+                      <MailPlus className="h-3 w-3" />
+                      Gmail add-on
+                    </span>
+                  ) : (
+                    <span className="font-medium text-foreground">{application.source ?? '—'}</span>
+                  )}
+                </div>
                 <p className="flex items-center justify-between">
                   Salary Range
                   <span className="font-medium text-foreground">{application.salary_range ?? '—'}</span>
                 </p>
               </div>
             </section>
+
+            {isGmailSource && (
+              <div className="rounded-xl border border-primary/30 bg-primary/5 p-4 text-xs text-primary">
+                Automatically captured from the JobMail Gmail add-on. Keep opening emails in Gmail to stay in sync.
+              </div>
+            )}
 
             {application.notes && (
               <section className="space-y-3 text-sm">
@@ -276,6 +319,91 @@ export default function ApplicationDetailPage() {
             </Dialog>
           </CardContent>
         </Card>
+
+        <div className="flex flex-col gap-6">
+          <Card className={detailCardStyles}>
+            <div className={detailOverlayStyles} />
+            <CardContent className="space-y-4 p-4 sm:p-6">
+              <section className="space-y-2">
+                <h2 className="text-sm font-semibold text-foreground">Quick status update</h2>
+                <p className="text-xs text-muted-foreground">
+                  Adjust the stage directly from here to keep your pipeline in sync with Gmail.
+                </p>
+              </section>
+
+              <div className="grid gap-2 sm:grid-cols-2">
+                <Button
+                  variant="outline"
+                  className="justify-start gap-2 border-primary/40 text-primary hover:bg-primary/10"
+                  onClick={() => handleStatusUpdate('interview_scheduled')}
+                  disabled={updatingStatus === 'interview_scheduled'}
+                >
+                  {updatingStatus === 'interview_scheduled' ? (
+                    <>Updating…</>
+                  ) : (
+                    <>
+                      <PhoneCall className="h-4 w-4" />
+                      Mark interview scheduled
+                    </>
+                  )}
+                </Button>
+                <Button
+                  variant="outline"
+                  className="justify-start gap-2 border-emerald-400/40 text-emerald-600 hover:bg-emerald-500/10"
+                  onClick={() => handleStatusUpdate('offer_received')}
+                  disabled={updatingStatus === 'offer_received'}
+                >
+                  {updatingStatus === 'offer_received' ? (
+                    <>Updating…</>
+                  ) : (
+                    <>
+                      <PartyPopper className="h-4 w-4" />
+                      Mark offer received
+                    </>
+                  )}
+                </Button>
+                <Button
+                  variant="outline"
+                  className="justify-start gap-2 border-rose-400/40 text-rose-600 hover:bg-rose-500/10"
+                  onClick={() => handleStatusUpdate('rejected')}
+                  disabled={updatingStatus === 'rejected'}
+                >
+                  {updatingStatus === 'rejected' ? (
+                    <>Updating…</>
+                  ) : (
+                    <>
+                      <Mail className="h-4 w-4" />
+                      Mark as rejection
+                    </>
+                  )}
+                </Button>
+                <Button
+                  variant="outline"
+                  className="justify-start gap-2 border-sky-400/40 text-sky-600 hover:bg-sky-500/10"
+                  onClick={() => handleStatusUpdate('applied')}
+                  disabled={updatingStatus === 'applied'}
+                >
+                  {updatingStatus === 'applied' ? (
+                    <>Updating…</>
+                  ) : (
+                    <>
+                      <NotebookPen className="h-4 w-4" />
+                      Reset to applied
+                    </>
+                  )}
+                </Button>
+              </div>
+
+              {isGmailSource && (
+                <AlertFooterCard />
+              )}
+            </CardContent>
+          </Card>
+
+          {!isGmailSource && (
+            <GmailAddonInstallCard className="hidden border-dashed border-primary/40 bg-background/80 lg:block" />
+          )}
+        </div>
 
         <Card className={detailCardStyles}>
           <div className={detailOverlayStyles} />
@@ -399,6 +527,14 @@ function EmptyState({ icon, message }: { icon: React.ReactNode; message: string 
     <div className="flex flex-col items-center gap-3 rounded-xl border border-dashed border-border/60 bg-muted/40 p-10 text-sm text-muted-foreground">
       <span className="rounded-full bg-card/80 p-3 text-muted-foreground">{icon}</span>
       {message}
+    </div>
+  );
+}
+
+function AlertFooterCard() {
+  return (
+    <div className="rounded-xl border border-primary/20 bg-primary/5 p-4 text-xs text-primary">
+      Status updates here will be reflected the next time you open the email in Gmail.
     </div>
   );
 }

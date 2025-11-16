@@ -32,11 +32,15 @@ class ApiClient {
 
     this.client = axios.create({
       baseURL,
-      timeout: 30000,
+      timeout: 30000, // 30 second timeout
       headers: {
         'Content-Type': 'application/json',
       },
     });
+    
+    // Simple in-memory cache for GET requests (5 minute TTL)
+    const cache = new Map<string, { data: any; expiry: number }>();
+    const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 
     // Add request interceptor to inject JWT token
     this.client.interceptors.request.use(async (config) => {
@@ -44,12 +48,28 @@ class ApiClient {
       if (session?.access_token) {
         config.headers.Authorization = `Bearer ${session.access_token}`;
       }
+      
+      // Store cache key in config for response interceptor
+      if (config.method === 'get' && !config.url?.includes('/auth')) {
+        (config as any).__cacheKey = `${config.method}:${config.url}`;
+      }
+      
       return config;
     });
 
-    // Add response interceptor for error handling
+    // Add response interceptor for error handling and caching
     this.client.interceptors.response.use(
-      (response) => response,
+      (response) => {
+        // Cache successful GET responses
+        const cacheKey = (response.config as any).__cacheKey;
+        if (cacheKey) {
+          cache.set(cacheKey, {
+            data: response.data,
+            expiry: Date.now() + CACHE_TTL,
+          });
+        }
+        return response;
+      },
       (error) => {
         if (error.response?.status === 401) {
           // Handle unauthorized - redirect to login
@@ -59,6 +79,9 @@ class ApiClient {
         return Promise.reject(error);
       }
     );
+    
+    // Store cache reference for use in methods
+    (this as any).__cache = cache;
   }
 
   // Application endpoints

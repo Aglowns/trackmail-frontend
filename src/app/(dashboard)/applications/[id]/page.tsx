@@ -118,7 +118,7 @@ export default function ApplicationDetailPage() {
             errorMessage = 'Network error: Could not reach server. Please check your connection.';
           } else if (axiosError.code === 'ERR_CANCELED') {
             errorMessage = 'Request was cancelled';
-          } else if (axiosError.response) {
+          } else if (axiosError.response && axiosError.response.status) {
             // HTTP error response
             const status = axiosError.response.status;
             if (status === 404) {

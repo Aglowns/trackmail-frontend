@@ -106,20 +106,51 @@ export default function ApplicationDetailPage() {
       
       // Extract error message from API response
       let errorMessage = 'Failed to update status';
-      if (error && typeof error === 'object' && 'response' in error) {
-        const apiError = error as { response?: { data?: { detail?: string | { message?: string } } } };
-        if (apiError.response?.data?.detail) {
-          const detail = apiError.response.data.detail;
-          if (typeof detail === 'string') {
-            errorMessage = detail;
-          } else if (typeof detail === 'object' && detail.message) {
-            errorMessage = detail.message;
+      
+      // Check for network errors
+      if (error && typeof error === 'object') {
+        // Axios error structure
+        if ('code' in error) {
+          const axiosError = error as { code?: string; message?: string; response?: { status?: number; data?: unknown } };
+          
+          // Network errors (no response from server)
+          if (axiosError.code === 'ERR_NETWORK' || axiosError.code === 'ECONNABORTED') {
+            errorMessage = 'Network error: Could not reach server. Please check your connection.';
+          } else if (axiosError.code === 'ERR_CANCELED') {
+            errorMessage = 'Request was cancelled';
+          } else if (axiosError.response) {
+            // HTTP error response
+            const status = axiosError.response.status;
+            if (status === 404) {
+              errorMessage = 'Application not found';
+            } else if (status === 403) {
+              errorMessage = 'You do not have permission to update this application';
+            } else if (status === 401) {
+              errorMessage = 'Authentication expired. Please sign in again.';
+            } else if (status >= 500) {
+              errorMessage = 'Server error. Please try again later.';
+            } else {
+              // Try to extract detail from response
+              const responseData = axiosError.response.data as { detail?: string | { message?: string } };
+              if (responseData?.detail) {
+                if (typeof responseData.detail === 'string') {
+                  errorMessage = responseData.detail;
+                } else if (typeof responseData.detail === 'object' && responseData.detail.message) {
+                  errorMessage = responseData.detail.message;
+                }
+              } else {
+                errorMessage = `Error ${status}: ${axiosError.message || 'Unknown error'}`;
+              }
+            }
+          } else if (axiosError.message) {
+            errorMessage = axiosError.message;
           }
+        } else if (error instanceof Error) {
+          errorMessage = error.message;
         }
-      } else if (error instanceof Error) {
-        errorMessage = error.message;
       }
       
+      console.error('Final error message:', errorMessage);
       toast.error(errorMessage);
     } finally {
       setUpdatingStatus(null);

@@ -1,4 +1,4 @@
-import axios, { AxiosResponse } from 'axios';
+import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
 import { supabase } from './supabase';
 import {
   Application,
@@ -39,8 +39,13 @@ class ApiClient {
     });
     
     // Simple in-memory cache for GET requests (5 minute TTL)
-    const cache = new Map<string, { data: any; expiry: number }>();
+    const cache = new Map<string, { data: unknown; expiry: number }>();
     const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+
+    // Extend AxiosRequestConfig to include cache key
+    interface ExtendedAxiosRequestConfig extends AxiosRequestConfig {
+      __cacheKey?: string;
+    }
 
     // Add request interceptor to inject JWT token
     this.client.interceptors.request.use(async (config) => {
@@ -51,7 +56,7 @@ class ApiClient {
       
       // Store cache key in config for response interceptor
       if (config.method === 'get' && !config.url?.includes('/auth')) {
-        (config as any).__cacheKey = `${config.method}:${config.url}`;
+        (config as ExtendedAxiosRequestConfig).__cacheKey = `${config.method}:${config.url}`;
       }
       
       return config;
@@ -61,7 +66,7 @@ class ApiClient {
     this.client.interceptors.response.use(
       (response) => {
         // Cache successful GET responses
-        const cacheKey = (response.config as any).__cacheKey;
+        const cacheKey = (response.config as ExtendedAxiosRequestConfig).__cacheKey;
         if (cacheKey) {
           cache.set(cacheKey, {
             data: response.data,
@@ -80,8 +85,9 @@ class ApiClient {
       }
     );
     
-    // Store cache reference for use in methods
-    (this as any).__cache = cache;
+    // Store cache reference for use in methods (using private property)
+    // We need to store the cache on the instance, but TypeScript doesn't allow dynamic properties
+    (this as Record<string, unknown>).__cache = cache;
   }
 
   // Application endpoints

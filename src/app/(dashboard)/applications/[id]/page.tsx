@@ -84,7 +84,6 @@ export default function ApplicationDetailPage() {
     load();
   }, [params.id]);
 
-  async function handleAddEvent() {
   async function handleStatusUpdate(nextStatus: ApplicationStatus) {
     if (!application) return;
 
@@ -101,8 +100,7 @@ export default function ApplicationDetailPage() {
     }
   }
 
-  const isGmailSource = application?.source?.toLowerCase().includes('gmail');
-
+  async function handleAddEvent() {
     if (!eventFormData.event_type || !eventFormData.notes.trim()) {
       toast.error('Please fill in all required fields');
       return;

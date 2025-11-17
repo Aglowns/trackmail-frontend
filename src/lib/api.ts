@@ -202,11 +202,42 @@ class ApiClient {
     id: string,
     data: Partial<UpdateApplicationRequest>,
   ): Promise<Application> {
-    const response: AxiosResponse<Application> = await this.client.patch(
-      `/v1/applications/${id}`,
-      data,
-    );
-    return response.data;
+    // Retry logic for cold starts (Render free tier can take 30+ seconds to wake up)
+    const maxRetries = 2;
+    let lastError: unknown;
+    
+    for (let attempt = 0; attempt <= maxRetries; attempt++) {
+      try {
+        if (attempt > 0) {
+          console.log(`🔄 Retry attempt ${attempt}/${maxRetries} for application update...`);
+          // Wait before retry (exponential backoff)
+          await new Promise(resolve => setTimeout(resolve, 1000 * attempt));
+        }
+        
+        const response: AxiosResponse<Application> = await this.client.patch(
+          `/v1/applications/${id}`,
+          data,
+        );
+        return response.data;
+      } catch (error) {
+        lastError = error;
+        
+        // Don't retry on 4xx errors (client errors)
+        if (error && typeof error === 'object' && 'response' in error) {
+          const axiosError = error as { response?: { status?: number } };
+          if (axiosError.response?.status && axiosError.response.status < 500) {
+            throw error; // Don't retry client errors
+          }
+        }
+        
+        // If this is the last attempt, throw the error
+        if (attempt === maxRetries) {
+          throw error;
+        }
+      }
+    }
+    
+    throw lastError;
   }
 
   async updateManyApplications(

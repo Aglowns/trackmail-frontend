@@ -92,11 +92,12 @@ export default function ApplicationDetailPage() {
 
     try {
       setUpdatingStatus(nextStatus);
-      console.log('Updating status to:', nextStatus, 'for application:', application.id);
+      console.log('🔄 Updating status to:', nextStatus, 'for application:', application.id);
+      console.log('📡 API URL:', process.env.NEXT_PUBLIC_API_URL);
       
       const updated = await apiClient.updateApplication(application.id, { status: nextStatus });
       
-      console.log('Status update successful:', updated);
+      console.log('✅ Status update successful:', updated);
       setApplication(updated);
       
       const statusLabel = nextStatus.replace(/_/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase());

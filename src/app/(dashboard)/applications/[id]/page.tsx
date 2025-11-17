@@ -85,16 +85,42 @@ export default function ApplicationDetailPage() {
   }, [params.id]);
 
   async function handleStatusUpdate(nextStatus: ApplicationStatus) {
-    if (!application) return;
+    if (!application) {
+      toast.error('Application not loaded');
+      return;
+    }
 
     try {
       setUpdatingStatus(nextStatus);
+      console.log('Updating status to:', nextStatus, 'for application:', application.id);
+      
       const updated = await apiClient.updateApplication(application.id, { status: nextStatus });
+      
+      console.log('Status update successful:', updated);
       setApplication(updated);
-      toast.success(`Status updated to ${nextStatus.replace('_', ' ')}`);
+      
+      const statusLabel = nextStatus.replace(/_/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase());
+      toast.success(`Status updated to ${statusLabel}`);
     } catch (error) {
-      console.error(error);
-      toast.error('Failed to update status');
+      console.error('Status update error:', error);
+      
+      // Extract error message from API response
+      let errorMessage = 'Failed to update status';
+      if (error && typeof error === 'object' && 'response' in error) {
+        const apiError = error as { response?: { data?: { detail?: string | { message?: string } } } };
+        if (apiError.response?.data?.detail) {
+          const detail = apiError.response.data.detail;
+          if (typeof detail === 'string') {
+            errorMessage = detail;
+          } else if (typeof detail === 'object' && detail.message) {
+            errorMessage = detail.message;
+          }
+        }
+      } else if (error instanceof Error) {
+        errorMessage = error.message;
+      }
+      
+      toast.error(errorMessage);
     } finally {
       setUpdatingStatus(null);
     }
@@ -331,10 +357,15 @@ export default function ApplicationDetailPage() {
 
               <div className="grid gap-2 sm:grid-cols-2">
                 <Button
+                  type="button"
                   variant="outline"
                   className="justify-start gap-2 border-primary/40 text-primary hover:bg-primary/10"
-                  onClick={() => handleStatusUpdate('interview_scheduled')}
-                  disabled={updatingStatus === 'interview_scheduled'}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    handleStatusUpdate('interview_scheduled');
+                  }}
+                  disabled={updatingStatus === 'interview_scheduled' || !application}
                 >
                   {updatingStatus === 'interview_scheduled' ? (
                     <>Updating…</>
@@ -346,10 +377,15 @@ export default function ApplicationDetailPage() {
                   )}
                 </Button>
                 <Button
+                  type="button"
                   variant="outline"
                   className="justify-start gap-2 border-emerald-400/40 text-emerald-600 hover:bg-emerald-500/10"
-                  onClick={() => handleStatusUpdate('offer_received')}
-                  disabled={updatingStatus === 'offer_received'}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    handleStatusUpdate('offer_received');
+                  }}
+                  disabled={updatingStatus === 'offer_received' || !application}
                 >
                   {updatingStatus === 'offer_received' ? (
                     <>Updating…</>
@@ -361,10 +397,15 @@ export default function ApplicationDetailPage() {
                   )}
                 </Button>
                 <Button
+                  type="button"
                   variant="outline"
                   className="justify-start gap-2 border-rose-400/40 text-rose-600 hover:bg-rose-500/10"
-                  onClick={() => handleStatusUpdate('rejected')}
-                  disabled={updatingStatus === 'rejected'}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    handleStatusUpdate('rejected');
+                  }}
+                  disabled={updatingStatus === 'rejected' || !application}
                 >
                   {updatingStatus === 'rejected' ? (
                     <>Updating…</>
@@ -376,10 +417,15 @@ export default function ApplicationDetailPage() {
                   )}
                 </Button>
                 <Button
+                  type="button"
                   variant="outline"
                   className="justify-start gap-2 border-sky-400/40 text-sky-600 hover:bg-sky-500/10"
-                  onClick={() => handleStatusUpdate('applied')}
-                  disabled={updatingStatus === 'applied'}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    handleStatusUpdate('applied');
+                  }}
+                  disabled={updatingStatus === 'applied' || !application}
                 >
                   {updatingStatus === 'applied' ? (
                     <>Updating…</>
